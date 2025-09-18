@@ -1,0 +1,15 @@
+# Supabase Environment Variables
+# Copy these to your .env.local file
+
+# Your Supabase project URL (found in your Supabase dashboard under Settings > API)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+
+# Your Supabase anon/public key (found in your Supabase dashboard under Settings > API)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Your Supabase service role key (found in your Supabase dashboard under Settings > API)
+# This is used for server-side operations and should be kept secret
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+
+# Optional: Set this to your production URL when deploying
+# NEXT_PUBLIC_SITE_URL=https://yourdomain.com

@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* Blob animation */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+  
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, #e53e3e 0%, #3182ce 100%);
+  }
+  
+  /* Student form specific styles - blue accents */
+  .student-form-accent {
+    @apply text-blue-500;
+  }
+  
+  .student-form-button {
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+  
+  .student-form-focus {
+    @apply focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400;
+  }
+  
+  .student-form-bg {
+    @apply bg-blue-50;
+  }
+  
+  /* Team form specific styles - red accents */
+  .team-form-accent {
+    @apply text-red-500;
+  }
+  
+  .team-form-button {
+    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+  
+  .team-form-focus {
+    @apply focus:ring-2 focus:ring-red-400/50 focus:border-red-400;
+  }
+  
+  .team-form-bg {
+    @apply bg-red-50;
+  }
+  
+  /* Slider styling for both forms */
+  [data-radix-slider-track] {
+    @apply bg-gray-200 !important;
+  }
+  
+  [data-radix-slider-range] {
+    @apply bg-blue-500;
+  }
+  
+  [data-radix-slider-thumb] {
+    @apply border-blue-500 bg-white;
+  }
+  
+  /* Team form specific slider styling */
+  .team-form-slider [data-radix-slider-range] {
+    @apply bg-red-500 !important;
+  }
+  
+  .team-form-slider [data-radix-slider-thumb] {
+    @apply border-red-500 bg-white !important;
+  }
+  
+  /* Ensure slider track is visible */
+  .slider-track {
+    @apply bg-gray-200 !important;
+  }
+  
+  /* Team form specific slider styling */
+  .team-form-slider [data-radix-slider-track] {
+    @apply bg-gray-200;
+  }
+  
+  .team-form-slider [data-radix-slider-range] {
+    @apply bg-red-500;
+  }
+  
+  .team-form-slider [data-radix-slider-thumb] {
+    @apply border-red-500 bg-white;
+  }
+  
+  /* Team form checkbox styling */
+  .team-form-checkbox {
+    @apply border-red-500 data-[state=checked]:bg-red-500 data-[state=checked]:text-white;
+  }
+  
+  /* Multi-select checkbox styling - square checkboxes */
+  .multi-select-checkbox {
+    @apply rounded-none;
+  }
+  
+  /* Single-select checkbox styling - circular checkboxes */
+  .single-select-checkbox {
+    @apply rounded-full !important;
+  }
+  
+  .modern-card {
+    @apply glass-effect rounded-2xl p-8 shadow-2xl;
+  }
+  
+  .modern-input {
+    @apply bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl px-4 py-3 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all duration-200;
+  }
+  
+  .modern-input[type="file"] {
+    @apply bg-transparent border-dashed border-2 border-white/40 hover:border-white/60 transition-all duration-200 !important;
+  }
+  
+  .modern-input[type="file"]::file-selector-button {
+    @apply bg-red-600 text-white font-semibold py-2 px-4 rounded-lg border-0 mr-4 hover:bg-red-700 transition-all duration-200;
+  }
+  
+  .modern-button {
+    @apply bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+  
+  /* Override for resume upload label to remove any background */
+  .resume-upload-label {
+    @apply bg-transparent !important;
+  }
+} 
