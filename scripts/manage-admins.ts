@@ -65,7 +65,7 @@ async function main() {
     const existingAdmins = adminsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }))
+    })) as Array<{ id: string; email?: string; [key: string]: any }>
 
     console.log(`Found ${existingAdmins.length} admin(s):`)
     existingAdmins.forEach((admin, index) => {
