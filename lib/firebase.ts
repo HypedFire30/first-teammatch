@@ -51,24 +51,36 @@ function initializeFirebase() {
   }
 }
 
+// Create a mock Auth object with no-op functions
+function createMockAuth(): Auth {
+  return {
+    currentUser: null,
+    onAuthStateChanged: () => () => {}, // Returns unsubscribe function
+    onIdTokenChanged: () => () => {},
+    signOut: async () => {},
+  } as any as Auth
+}
+
 // Getter functions that initialize Firebase on first access
 function getAuthInstance(): Auth {
   if (typeof window !== 'undefined') {
     initializeFirebase()
     if (!authInstance) {
-      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+      // Return mock instead of throwing - allows app to work without Firebase
+      return createMockAuth()
     }
     return authInstance
   }
   // During build, return a mock object
-  return {} as Auth
+  return createMockAuth()
 }
 
 function getDbInstance(): Firestore {
   if (typeof window !== 'undefined') {
     initializeFirebase()
     if (!dbInstance) {
-      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+      // Return mock instead of throwing - allows app to work without Firebase
+      return {} as Firestore
     }
     return dbInstance
   }
@@ -80,7 +92,8 @@ function getStorageInstance(): FirebaseStorage {
   if (typeof window !== 'undefined') {
     initializeFirebase()
     if (!storageInstance) {
-      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+      // Return mock instead of throwing - allows app to work without Firebase
+      return {} as FirebaseStorage
     }
     return storageInstance
   }

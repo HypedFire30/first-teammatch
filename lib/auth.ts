@@ -29,6 +29,9 @@ import {
 } from 'firebase/storage'
 import { auth, db, storage, isFirebaseConfigured } from './firebase'
 
+// Re-export isFirebaseConfigured for convenience
+export { isFirebaseConfigured }
+
 export interface UserProfile {
   type: 'student' | 'team' | 'admin'
   profile: any

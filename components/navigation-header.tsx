@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus, Menu, X, LogIn, LogOut, Bug } from "lucide-react";
 import Image from "next/image";
-import { getSession, signOut, getUserProfile, onAuthStateChanged, auth } from "@/lib/auth";
+import { getSession, signOut, getUserProfile, onAuthStateChanged, auth, isFirebaseConfigured } from "@/lib/auth";
 
 export function NavigationHeader() {
   const pathname = usePathname();
@@ -77,21 +77,28 @@ Additional Details:
     }
     checkAuth();
 
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setIsAuthenticated(!!user);
+    // Listen for auth state changes (only if Firebase is configured)
+    let unsubscribe: (() => void) | undefined;
+    if (isFirebaseConfigured()) {
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        setIsAuthenticated(!!user);
 
-      if (user) {
-        const { profile } = await getUserProfile(user.uid);
-        if (profile) {
-          setUserType(profile.type);
+        if (user) {
+          const { profile } = await getUserProfile(user.uid);
+          if (profile) {
+            setUserType(profile.type);
+          }
+        } else {
+          setUserType(null);
         }
-      } else {
-        setUserType(null);
-      }
-    });
+      });
+    }
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   return (
