@@ -52,13 +52,13 @@ function initializeFirebase() {
 }
 
 // Export services - they will be initialized on first use in browser
-// During build, if not configured, these will be null but TypeScript won't know
+// During build, if not configured, these will be null but we cast to the expected type
 export const auth = (() => {
   // Only initialize in browser, and only if configured
   if (typeof window !== 'undefined' && isFirebaseConfigured()) {
     initializeFirebase()
   }
-  return authInstance
+  return authInstance as unknown as Auth
 })() as Auth
 
 export const db = (() => {
@@ -66,7 +66,7 @@ export const db = (() => {
   if (typeof window !== 'undefined' && isFirebaseConfigured()) {
     initializeFirebase()
   }
-  return dbInstance
+  return dbInstance as unknown as Firestore
 })() as Firestore
 
 export const storage = (() => {
@@ -74,6 +74,6 @@ export const storage = (() => {
   if (typeof window !== 'undefined' && isFirebaseConfigured()) {
     initializeFirebase()
   }
-  return storageInstance
+  return storageInstance as unknown as FirebaseStorage
 })() as FirebaseStorage
 
