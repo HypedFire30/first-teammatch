@@ -51,29 +51,74 @@ function initializeFirebase() {
   }
 }
 
-// Export services - they will be initialized on first use in browser
-// During build, if not configured, these will be null but we cast to the expected type
-export const auth = (() => {
-  // Only initialize in browser, and only if configured
-  if (typeof window !== 'undefined' && isFirebaseConfigured()) {
+// Getter functions that initialize Firebase on first access
+function getAuthInstance(): Auth {
+  if (typeof window !== 'undefined') {
     initializeFirebase()
+    if (!authInstance) {
+      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+    }
+    return authInstance
   }
-  return authInstance as unknown as Auth
-})() as Auth
+  // During build, return a mock object
+  return {} as Auth
+}
 
-export const db = (() => {
-  // Only initialize in browser, and only if configured
-  if (typeof window !== 'undefined' && isFirebaseConfigured()) {
+function getDbInstance(): Firestore {
+  if (typeof window !== 'undefined') {
     initializeFirebase()
+    if (!dbInstance) {
+      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+    }
+    return dbInstance
   }
-  return dbInstance as unknown as Firestore
-})() as Firestore
+  // During build, return a mock object
+  return {} as Firestore
+}
 
-export const storage = (() => {
-  // Only initialize in browser, and only if configured
-  if (typeof window !== 'undefined' && isFirebaseConfigured()) {
+function getStorageInstance(): FirebaseStorage {
+  if (typeof window !== 'undefined') {
     initializeFirebase()
+    if (!storageInstance) {
+      throw new Error('Firebase is not configured. Please set Firebase environment variables.')
+    }
+    return storageInstance
   }
-  return storageInstance as unknown as FirebaseStorage
-})() as FirebaseStorage
+  // During build, return a mock object
+  return {} as FirebaseStorage
+}
+
+// Export services using Proxy to make them lazy
+export const auth = new Proxy({} as Auth, {
+  get(_target, prop) {
+    const instance = getAuthInstance()
+    const value = (instance as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(instance)
+    }
+    return value
+  }
+})
+
+export const db = new Proxy({} as Firestore, {
+  get(_target, prop) {
+    const instance = getDbInstance()
+    const value = (instance as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(instance)
+    }
+    return value
+  }
+})
+
+export const storage = new Proxy({} as FirebaseStorage, {
+  get(_target, prop) {
+    const instance = getStorageInstance()
+    const value = (instance as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(instance)
+    }
+    return value
+  }
+})
 
