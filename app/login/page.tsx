@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, getUserType, resendConfirmationEmail } from "@/lib/auth";
+import { signIn, getUserType, resendConfirmationEmail, sendPasswordReset } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,9 @@ export default function LoginPage() {
   const [showResendOption, setShowResendOption] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +48,7 @@ export default function LoginPage() {
 
     if (user) {
       // Check user type to determine redirect
-      const { type, error: typeError } = await getUserType(user.id);
+      const { type, error: typeError } = await getUserType(user.uid);
 
       if (typeError) {
         setError("Error determining user type. Please try again.");
@@ -84,6 +87,34 @@ export default function LoginPage() {
     setIsResending(false);
   };
 
+  const handleForgotPassword = async () => {
+    if (!email || !email.trim()) {
+      setError("Please enter your email address first.");
+      return;
+    }
+
+    setIsSendingReset(true);
+    setError("");
+    setResetSuccess(false);
+
+    console.log('Password reset requested for email:', email);
+    
+    const { error: resetError } = await sendPasswordReset(email);
+
+    if (resetError) {
+      console.error('Password reset error:', resetError);
+      setError(`Failed to send password reset email: ${resetError.message}`);
+      setResetSuccess(false);
+    } else {
+      console.log('Password reset email sent successfully');
+      setResetSuccess(true);
+      setShowForgotPassword(false);
+      setError(""); // Clear any previous errors
+    }
+
+    setIsSendingReset(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
@@ -114,9 +145,18 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-700 font-medium">
-                Password
-              </Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="password" className="text-gray-700 font-medium">
+                  Password
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Forgot Password?
+                </button>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -149,11 +189,55 @@ export default function LoginPage() {
               </div>
             )}
 
+            {showForgotPassword && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <p className="text-blue-600 text-sm mb-2">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={isSendingReset || !email || !email.trim()}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSendingReset ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setResetSuccess(false);
+                      setError(""); // Clear errors when canceling
+                    }}
+                    variant="outline"
+                    className="text-sm py-1 px-3 rounded"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+                {isSendingReset && (
+                  <p className="text-blue-600 text-xs mt-2">
+                    Sending password reset email...
+                  </p>
+                )}
+              </div>
+            )}
+
             {resendSuccess && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3">
                 <p className="text-green-600 text-sm">
                   ✅ Confirmation email sent! Please check your inbox and spam
                   folder.
+                </p>
+              </div>
+            )}
+
+            {resetSuccess && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                <p className="text-green-600 text-sm">
+                  ✅ Password reset email sent! Please check your inbox and spam folder.
+                  Click the link in the email to reset your password.
                 </p>
               </div>
             )}

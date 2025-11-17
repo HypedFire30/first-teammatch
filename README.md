@@ -1,168 +1,111 @@
 # FIRST Robotics Registration System
 
-A comprehensive platform for matching students with FIRST Robotics teams, featuring secure file uploads and a separate admin system.
+A modern platform for matching students with FIRST Robotics teams, featuring a streamlined registration process and intuitive user interface.
 
-## 🚀 New Features
+## 🚀 Features
 
-### 1. Resume File Upload System
+### Student Registration
+- Multi-step form with progress tracking
+- Profile creation with skills, interests, and availability
+- Optional resume upload (PDF, DOC, DOCX up to 10MB)
+- Secure authentication and data storage
 
-- **Secure Storage**: Resume files are uploaded to Supabase Storage instead of being stored as text
-- **File Management**: Automatic file naming and organization in the `resumes/student-resumes/` folder
-- **Public Access**: Files are accessible via public URLs for admin viewing
-- **Supported Formats**: PDF, DOC, DOCX (up to 10MB)
+### Team Registration
+- Comprehensive team profile setup
+- Areas of need and student requirements
+- Grade range and time commitment preferences
+- Team achievements and qualities selection
 
-### 2. Separate Admin System
-
-- **Dedicated Admin Table**: Admins are stored separately from students/teams
-- **Manual Admin Creation**: Admin accounts are manually added to the database
-- **No Registration Forms**: Admins don't fill out student/team registration forms
-- **Secure Authentication**: Admin authentication is handled separately
+### Admin Dashboard
+- View and manage student registrations
+- View and manage team registrations
+- User profile management
 
 ## 📋 Setup Instructions
 
-### 1. Database Setup
+### 1. Environment Variables
 
-Run the following SQL scripts in your Supabase SQL Editor:
-
-1. **Update Database Schema**:
-
-   ```sql
-   -- Run update-database.sql
-   ```
-
-2. **Create Storage Bucket**:
-   - Go to Supabase Dashboard → Storage
-   - Create a new bucket named `resumes`
-   - Set it as public
-   - Set file size limit to 10MB
-   - Allow MIME types: `application/pdf`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
-
-### 2. Environment Variables
-
-Ensure your `.env.local` has:
+Create a `.env.local` file with Firebase configuration:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 ```
 
-### 3. Admin Account Setup
+### 2. Firebase Setup
 
-The system automatically creates an admin account for `vedrshah09@gmail.com`. To add more admins, run:
+1. **Enable Authentication**: Go to Firebase Console → Authentication → Enable Email/Password
+2. **Create Firestore Database**: Go to Firebase Console → Firestore Database → Create database
+3. **Set Up Storage**: Go to Firebase Console → Storage → Get started
+4. **Configure Security Rules**: Set up Firestore and Storage security rules
 
-```sql
-INSERT INTO admins (name, email, role) VALUES
-('Admin Name', 'admin@email.com', 'admin');
+### 3. Install Dependencies
+
+```bash
+npm install
 ```
 
-## 🔧 How It Works
+### 4. Run Development Server
 
-### Resume Upload Process
-
-1. Student selects a resume file during registration
-2. File is uploaded to Supabase Storage with a unique filename
-3. File path is stored in the `resume_url` column
-4. Admin can view files via the admin dashboard
-
-### Admin Authentication
-
-1. Admin logs in with email/password
-2. System checks if email exists in the `admins` table
-3. If found, admin is redirected to `/admin`
-4. If not found, user is treated as student/team
-
-### File Access
-
-- **Upload**: Students can upload files during registration
-- **View**: Admins can view files via the admin dashboard
-- **Storage**: Files are stored securely in Supabase Storage
-- **URLs**: Public URLs are generated for easy access
-
-## 📁 File Structure
-
-```
-resumes/
-├── student-resumes/
-│   ├── 1703123456789_alex_resume.pdf
-│   ├── 1703123456790_sarah_resume.pdf
-│   └── ...
+```bash
+npm run dev
 ```
 
-## 🛠️ API Functions
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### File Upload Utilities (`lib/utils.ts`)
+## 🏗️ Tech Stack
 
-- `uploadFile()`: Upload file to Supabase Storage
-- `getFileUrl()`: Generate public URL for file
-- `deleteFile()`: Delete file from storage
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
+- **Storage**: Firebase Storage
+- **UI**: Tailwind CSS, Shadcn UI, Radix UI
+- **Forms**: React Hook Form, Zod
+- **Language**: TypeScript
 
-### Authentication (`lib/auth.ts`)
+## 📝 Project Structure
 
-- `signUp()`: Register students/teams with file upload support
-- `isAdmin()`: Check if user is admin
-- `getUserProfile()`: Get user profile (student/team/admin)
+```
+app/
+  ├── admin/                    # Admin dashboard
+  ├── dashboard/                # User dashboard
+  ├── login/                    # Authentication
+  ├── student-registration/     # Student signup form
+  └── team-registration/        # Team signup form
 
-## 🔒 Security Features
+components/
+  ├── ui/                       # Reusable UI components
+  └── navigation-header.tsx      # Global navigation
 
-- **Authenticated Uploads**: Only authenticated users can upload files
-- **Secure Storage**: Files stored in Supabase Storage with proper policies
-- **Admin Isolation**: Admin accounts separate from regular users
-- **File Validation**: File type and size validation
+lib/
+  ├── firebase.ts               # Firebase configuration
+  ├── auth.ts                   # Authentication functions
+  └── utils.ts                  # Utility functions
 
-## 📊 Database Schema
+scripts/
+  ├── migrate-to-firebase.ts    # Data migration utilities
+  ├── manage-admins.ts          # Admin management
+  └── import-auth-accounts.ts  # Auth account import
+```
 
-### New Tables
+## 🎨 Design
 
-- `admins`: Stores admin user information
-- Updated `students`: Added `resume_url` column
+- Clean, modern interface with FIRST Robotics colors (red, blue, green)
+- Responsive design optimized for all devices
+- Smooth animations and transitions
+- Accessible form components
 
-### Updated Views
+## 🔒 Security
 
-- `potential_matches`: Updated to use new schema
+- Firestore security rules restrict access based on user authentication
+- Storage rules limit file uploads to authenticated users
+- Admin access verified through Firestore document checks
+- Secure password requirements and validation
 
-## 🎯 Usage
+## 📄 License
 
-### For Students
-
-1. Register at `/student-registration`
-2. Upload resume file (optional)
-3. Fill out profile information
-4. Submit registration
-
-### For Admins
-
-1. Login at `/login` with admin credentials
-2. Access admin dashboard at `/admin`
-3. View student submissions and resume files
-4. Manage matches between students and teams
-
-### For Teams
-
-1. Register at `/team-registration`
-2. Fill out team information
-3. Submit registration
-
-## 🚨 Important Notes
-
-1. **Admin Accounts**: Must be manually added to the database
-2. **File Storage**: Requires Supabase Storage bucket setup
-3. **File Limits**: 10MB maximum file size
-4. **Supported Formats**: PDF, DOC, DOCX only
-5. **Public Access**: Resume files are publicly accessible via URLs
-
-## 🔄 Migration from Old System
-
-If you have existing data:
-
-1. Run the `update-database.sql` script
-2. Existing `resume_url` data will remain and new uploads also use `resume_url`
-3. Admin accounts need to be manually added to the `admins` table
-
-## 📞 Support
-
-For issues or questions:
-
-1. Check the database schema in `database-schema.sql`
-2. Review the storage setup in `SUPABASE_STORAGE_SETUP.md`
-3. Verify environment variables are correctly set
-4. Ensure Supabase Storage bucket is properly configured
+Private project

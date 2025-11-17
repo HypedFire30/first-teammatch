@@ -1,16 +1,33 @@
-import { createClient } from '@supabase/supabase-js'
-import { User, Session } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-// Use a single Supabase client instance to avoid multiple instances warning
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    storageKey: 'supabase-auth'
-  }
-})
+import { 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+  updatePassword as firebaseUpdatePassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  getAuth
+} from 'firebase/auth'
+import { 
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  query,
+  where,
+  orderBy,
+  updateDoc,
+  Timestamp
+} from 'firebase/firestore'
+import { 
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage'
+import { auth, db, storage, isFirebaseConfigured } from './firebase'
 
 export interface UserProfile {
   type: 'student' | 'team' | 'admin'
@@ -21,122 +38,143 @@ export interface AuthError {
   message: string
 }
 
+export interface Session {
+  user: FirebaseUser
+}
+
 // Sign up a new user (student or team)
 export async function signUp(email: string, password: string, userData: any, userType: 'student' | 'team') {
+  if (!isFirebaseConfigured()) {
+    return { user: null, error: { message: 'Firebase is not configured. Please set Firebase environment variables in .env.local' } }
+  }
+  
   try {
     console.log("signUp called with:", { email, userType, userData });
 
-    // First, sign out any existing user to ensure clean state
-    await supabase.auth.signOut();
+    // Sign out any existing user to ensure clean state
+    try {
+      await firebaseSignOut(auth);
+    } catch (e) {
+      // Ignore errors if no user is signed in
+    }
 
     // Create the auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    })
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    if (authError) {
-      console.error("Auth error:", authError);
-      throw authError;
+    // Send email verification
+    await sendEmailVerification(user);
+
+    console.log("Auth user created:", user.uid);
+
+    // Handle file upload if present (for student resumes)
+    let processedUserData = { ...userData };
+    if (userType === 'student' && userData.resume_file && userData.resume_file instanceof File) {
+      try {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${userData.resume_file.name.split('.').pop()}`;
+        const filePath = `student-resumes/${fileName}`;
+
+        console.log("Uploading resume file:", filePath);
+
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, userData.resume_file);
+
+        console.log("File uploaded successfully");
+
+        // Replace the file object with the file path
+        processedUserData.resume_url = filePath;
+
+      } catch (uploadError: any) {
+        console.error("Resume upload failed:", uploadError);
+        // Continue without the resume if upload fails
+        delete processedUserData.resume_file;
+      }
     }
 
-    if (authData.user) {
-      console.log("Auth user created:", authData.user.id);
-
-      // Handle file upload if present (for student resumes)
-      let processedUserData = { ...userData };
-      if (userType === 'student' && userData.resume_file && userData.resume_file instanceof File) {
-        try {
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${userData.resume_file.name.split('.').pop()}`;
-          const filePath = `student-resumes/${fileName}`;
-
-          console.log("Uploading resume file:", filePath);
-
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('resumes')
-            .upload(filePath, userData.resume_file, {
-              cacheControl: '3600',
-              upsert: false
-            });
-
-          if (uploadError) {
-            console.error("File upload error:", uploadError);
-            throw uploadError;
-          }
-
-          console.log("File uploaded successfully:", uploadData);
-
-          // Get the public URL for the uploaded file
-          const { data: urlData } = supabase.storage
-            .from('resumes')
-            .getPublicUrl(filePath);
-
-          // Replace the file object with the file path
-          processedUserData.resume_url = filePath;
-
-        } catch (uploadError: any) {
-          console.error("Resume upload failed:", uploadError);
-          // Continue without the resume if upload fails
-          delete processedUserData.resume_file;
-        }
-      }
-
-      // Insert the user data into the appropriate table
-      const tableName = userType === 'student' ? 'students' : 'teams'
-      console.log("Inserting into table:", tableName);
-      console.log("Inserting data:", processedUserData);
-
-      const { data: insertData, error: insertError } = await supabase
-        .from(tableName)
-        .insert(processedUserData)
-        .select()
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        throw insertError;
-      }
-
-      console.log("Data inserted successfully:", insertData);
-
-      // Force a session refresh to ensure the new user is properly authenticated
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error("Session error:", sessionError);
-      } else {
-        console.log("Session refreshed:", sessionData.session?.user.id);
-      }
-
-      return { user: authData.user, error: null }
+    // Add metadata
+    processedUserData.created_at = Timestamp.now();
+    processedUserData.updated_at = Timestamp.now();
+    if (userType === 'student') {
+      processedUserData.is_matched = false;
     }
 
-    return { user: null, error: { message: 'Failed to create user' } }
+    // Insert the user data into the appropriate collection
+    const collectionName = userType === 'student' ? 'students' : 'teams'
+    console.log("Inserting into collection:", collectionName);
+    console.log("Inserting data:", processedUserData);
+
+    await setDoc(doc(db, collectionName, user.uid), processedUserData);
+
+    console.log("Data inserted successfully");
+
+    return { user, error: null }
   } catch (error: any) {
     console.error("signUp error:", error);
-    return { user: null, error: { message: error.message } }
+    
+    // Handle rate limiting specifically
+    if (error.code === 'auth/too-many-requests') {
+      return { 
+        user: null, 
+        error: { 
+          message: 'Too many requests. Please wait a few minutes before trying again. Firebase has rate limits to prevent abuse.' 
+        } 
+      }
+    }
+    
+    // Handle other common errors
+    let errorMessage = error.message;
+    if (error.code === 'auth/email-already-in-use') {
+      errorMessage = 'This email is already registered. Please sign in instead.';
+    } else if (error.code === 'auth/weak-password') {
+      errorMessage = 'Password is too weak. Please use a stronger password.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email address. Please check your email and try again.';
+    }
+    
+    return { user: null, error: { message: errorMessage } }
   }
 }
 
 // Sign in existing user
 export async function signIn(email: string, password: string) {
+  if (!isFirebaseConfigured()) {
+    return { user: null, error: { message: 'Firebase is not configured. Please set Firebase environment variables in .env.local' } }
+  }
+  
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) throw error
-
-    return { user: data.user, error: null }
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return { user: userCredential.user, error: null }
   } catch (error: any) {
-    return { user: null, error: { message: error.message } }
+    // Handle rate limiting specifically
+    if (error.code === 'auth/too-many-requests') {
+      return { 
+        user: null, 
+        error: { 
+          message: 'Too many sign-in attempts. Please wait a few minutes before trying again.' 
+        } 
+      }
+    }
+    
+    // Handle other common errors
+    let errorMessage = error.message;
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with this email. Please check your email or sign up.';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Incorrect password. Please try again.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email address. Please check your email and try again.';
+    } else if (error.code === 'auth/user-disabled') {
+      errorMessage = 'This account has been disabled. Please contact support.';
+    }
+    
+    return { user: null, error: { message: errorMessage } }
   }
 }
 
 // Sign out user
 export async function signOut() {
   try {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    await firebaseSignOut(auth)
     return { error: null }
   } catch (error: any) {
     return { error: { message: error.message } }
@@ -146,24 +184,85 @@ export async function signOut() {
 // Resend confirmation email
 export async function resendConfirmationEmail(email: string) {
   try {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email,
-    })
-
-    if (error) throw error
+    const user = auth.currentUser;
+    if (!user) {
+      return { error: { message: 'No user is currently signed in' } }
+    }
+    await sendEmailVerification(user);
     return { error: null }
   } catch (error: any) {
+    // Handle rate limiting specifically
+    if (error.code === 'auth/too-many-requests') {
+      return { 
+        error: { 
+          message: 'Too many verification email requests. Please wait a few minutes before requesting another email.' 
+        } 
+      }
+    }
+    
     return { error: { message: error.message } }
+  }
+}
+
+// Send password reset email
+export async function sendPasswordReset(email: string) {
+  if (!isFirebaseConfigured()) {
+    return { error: { message: 'Firebase is not configured' } }
+  }
+  
+  // Validate email format
+  if (!email || !email.trim()) {
+    return { error: { message: 'Please enter a valid email address' } }
+  }
+  
+  try {
+    console.log('Sending password reset email to:', email);
+    await sendPasswordResetEmail(auth, email);
+    console.log('Password reset email sent successfully');
+    return { error: null }
+  } catch (error: any) {
+    console.error('Password reset error:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+    
+    // Handle rate limiting specifically
+    if (error.code === 'auth/too-many-requests') {
+      return { 
+        error: { 
+          message: 'Too many password reset requests. Please wait a few minutes before requesting another reset email.' 
+        } 
+      }
+    }
+    
+    // Handle other common errors
+    let errorMessage = error.message;
+    if (error.code === 'auth/user-not-found') {
+      // Don't reveal if email exists - security best practice
+      // But still return success to user to prevent email enumeration
+      console.log('User not found, but returning success for security');
+      return { error: null }
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email address. Please check your email and try again.';
+    } else if (error.code === 'auth/missing-email') {
+      errorMessage = 'Email address is required.';
+    }
+    
+    return { error: { message: errorMessage } }
   }
 }
 
 // Get current user session
 export async function getSession() {
+  if (!isFirebaseConfigured()) {
+    return { session: null, error: { message: 'Firebase is not configured' } }
+  }
+  
   try {
-    const { data: { session }, error } = await supabase.auth.getSession()
-    if (error) throw error
-    return { session, error: null }
+    const user = auth.currentUser;
+    if (user) {
+      return { session: { user }, error: null }
+    }
+    return { session: null, error: null }
   } catch (error: any) {
     return { session: null, error: { message: error.message } }
   }
@@ -171,9 +270,12 @@ export async function getSession() {
 
 // Get current user
 export async function getCurrentUser() {
+  if (!isFirebaseConfigured()) {
+    return { user: null, error: { message: 'Firebase is not configured' } }
+  }
+  
   try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) throw error
+    const user = auth.currentUser;
     return { user, error: null }
   } catch (error: any) {
     return { user: null, error: { message: error.message } }
@@ -182,58 +284,46 @@ export async function getCurrentUser() {
 
 // Get user profile (student/team/admin data)
 export async function getUserProfile(userId: string): Promise<{ profile: UserProfile | null, error: AuthError | null }> {
+  if (!isFirebaseConfigured()) {
+    return { profile: null, error: { message: 'Firebase is not configured' } }
+  }
+  
   try {
-    // First, get the current user's email
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError) throw userError
-    if (!user) throw new Error('User not found')
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
 
-    // Check if user exists in admins table
-    const { data: adminData, error: adminError } = await supabase
-      .from('admins')
-      .select('*')
-      .eq('email', user.email)
-      .single()
-
-    if (adminData) {
+    // Check if user exists in admins collection
+    const adminDoc = await getDoc(doc(db, 'admins', userId));
+    if (adminDoc.exists()) {
       return {
         profile: {
           type: 'admin',
-          profile: adminData
+          profile: { id: adminDoc.id, ...adminDoc.data() }
         },
         error: null
       }
     }
 
-    // Check if user exists in students table
-    const { data: studentData, error: studentError } = await supabase
-      .from('students')
-      .select('*')
-      .eq('email', user.email)
-      .single()
-
-    if (studentData) {
+    // Check if user exists in students collection
+    const studentDoc = await getDoc(doc(db, 'students', userId));
+    if (studentDoc.exists()) {
       return {
         profile: {
           type: 'student',
-          profile: studentData
+          profile: { id: studentDoc.id, ...studentDoc.data() }
         },
         error: null
       }
     }
 
-    // Check if user exists in teams table
-    const { data: teamData, error: teamError } = await supabase
-      .from('teams')
-      .select('*')
-      .eq('email', user.email)
-      .single()
-
-    if (teamData) {
+    // Check if user exists in teams collection
+    const teamDoc = await getDoc(doc(db, 'teams', userId));
+    if (teamDoc.exists()) {
       return {
         profile: {
           type: 'team',
-          profile: teamData
+          profile: { id: teamDoc.id, ...teamDoc.data() }
         },
         error: null
       }
@@ -259,50 +349,42 @@ export async function getUserMatches(userId: string): Promise<{ matches: any[] |
 
     if (profile.type === 'student') {
       // For students, check if they're matched to a team
-      const { data: studentData, error: studentError } = await supabase
-        .from('students')
-        .select(`
-          *,
-          teams (
-            id,
-            team_name,
-            email,
-            first_level,
-            time_commitment,
-            grade_range_min,
-            grade_range_max,
-            zip_code,
-            areas_of_need,
-            qualities
-          )
-        `)
-        .eq('id', profile.profile.id)
-        .single()
-
-      if (studentError) throw studentError
-
-      if (studentData && studentData.is_matched && studentData.teams) {
-        // Student is matched to a team
-        return {
-          matches: [{
-            type: 'matched',
-            team: studentData.teams,
-            matchedAt: studentData.created_at
-          }],
-          error: null
-        }
-      } else {
-        // Student is not matched - return empty array
+      const studentDoc = await getDoc(doc(db, 'students', userId));
+      if (!studentDoc.exists()) {
         return { matches: [], error: null }
       }
+
+      const studentData = { id: studentDoc.id, ...studentDoc.data() } as any;
+      
+      if (studentData.is_matched && studentData.matched_team_id) {
+        // Get the matched team
+        const teamDoc = await getDoc(doc(db, 'teams', studentData.matched_team_id));
+        if (teamDoc.exists()) {
+          const teamData = { id: teamDoc.id, ...teamDoc.data() };
+          return {
+            matches: [{
+              type: 'matched',
+              team: teamData,
+              matchedAt: studentData.created_at
+            }],
+            error: null
+          }
+        }
+      }
+      
+      // Student is not matched - return empty array
+      return { matches: [], error: null }
     } else if (profile.type === 'team') {
       // For teams, get all students matched to this team
-      const { data: matchedStudents, error: studentsError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('matched_team_id', profile.profile.id)
-
-      if (studentsError) throw studentsError
+      const studentsQuery = query(
+        collection(db, 'students'),
+        where('matched_team_id', '==', userId)
+      );
+      const studentsSnapshot = await getDocs(studentsQuery);
+      const matchedStudents = studentsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
 
       return {
         matches: matchedStudents || [],
@@ -321,12 +403,11 @@ export async function getUserMatches(userId: string): Promise<{ matches: any[] |
 // Update user password
 export async function updatePassword(newPassword: string) {
   try {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword
-    })
-
-    if (error) throw error
-
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('No user is currently signed in')
+    }
+    await firebaseUpdatePassword(user, newPassword);
     return { error: null }
   } catch (error: any) {
     return { error: { message: error.message } }
@@ -339,11 +420,15 @@ export function isAuthenticated(session: Session | null): boolean {
 }
 
 // Get public URL for resume file
-export function getResumeUrl(filePath: string): string {
-  const { data } = supabase.storage
-    .from('resumes')
-    .getPublicUrl(filePath);
-  return data.publicUrl;
+export async function getResumeUrl(filePath: string): Promise<string> {
+  try {
+    const storageRef = ref(storage, filePath);
+    const url = await getDownloadURL(storageRef);
+    return url;
+  } catch (error: any) {
+    console.error('Error getting resume URL:', error);
+    return '';
+  }
 }
 
 // Get user type from session
@@ -359,3 +444,6 @@ export async function getUserType(userId: string): Promise<{ type: string | null
     return { type: null, error: { message: error.message } }
   }
 }
+
+// Export auth instance for onAuthStateChange
+export { auth, onAuthStateChanged }

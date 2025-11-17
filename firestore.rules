@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Students collection
+    // Users can read their own student profile
+    // Users can create their own student profile
+    match /students/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // Teams collection
+    // Users can read their own team profile
+    // Users can create their own team profile
+    match /teams/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // Admins collection
+    // Only admins can read admin profiles
+    // Only admins can read other admin profiles (for admin dashboard)
+    match /admins/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if false; // Admins must be created manually
+      allow update: if false; // Admins must be updated manually
+      allow delete: if false; // Admins must be deleted manually
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

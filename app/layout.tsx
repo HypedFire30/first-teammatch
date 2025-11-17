@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NavigationHeader />
-        <main className="min-h-screen gradient-bg">{children}</main>
+        <main className="min-h-screen bg-white page-enter">{children}</main>
       </body>
     </html>
   );

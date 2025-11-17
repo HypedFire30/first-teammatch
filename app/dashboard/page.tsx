@@ -6,7 +6,6 @@ import {
   getSession,
   getUserProfile,
   getUserMatches,
-  signOut,
 } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +18,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  LogOut,
   User,
   Users,
   Mail,
@@ -53,7 +51,7 @@ export default function DashboardPage() {
       try {
         // Load user profile
         const { profile, error: profileError } = await getUserProfile(
-          session.user.id
+          session.user.uid
         );
         if (profileError) throw profileError;
 
@@ -67,7 +65,7 @@ export default function DashboardPage() {
 
         // Load user matches
         const { matches: userMatches, error: matchesError } =
-          await getUserMatches(session.user.id);
+          await getUserMatches(session.user.uid);
         if (matchesError) throw matchesError;
 
         setMatches(userMatches || []);
@@ -80,11 +78,6 @@ export default function DashboardPage() {
 
     loadDashboard();
   }, [router]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
-  };
 
   if (isLoading) {
     return (
@@ -100,9 +93,14 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <p className="text-red-600 mb-4">Error: {error}</p>
-          <Button onClick={() => router.push("/login")}>Back to Login</Button>
+          <Button 
+            onClick={() => router.push("/login")}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Back to Login
+          </Button>
         </div>
       </div>
     );
@@ -111,9 +109,14 @@ export default function DashboardPage() {
   if (!userProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <p className="text-gray-600 mb-4">User profile not found</p>
-          <Button onClick={() => router.push("/login")}>Back to Login</Button>
+          <Button 
+            onClick={() => router.push("/login")}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Back to Login
+          </Button>
         </div>
       </div>
     );
@@ -126,51 +129,20 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isStudent
-                  ? "Student Dashboard"
-                  : isTeam
-                  ? "Team Dashboard"
-                  : "Admin Dashboard"}
-              </h1>
-              <Badge
-                variant={
-                  isStudent ? "default" : isTeam ? "secondary" : "destructive"
-                }
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Badge>
-            </div>
-            <Button
-              onClick={handleSignOut}
-              variant="outline"
-              className="flex items-center space-x-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="flex items-center space-x-2">
-                      <User className="h-5 w-5" />
-                      <span>Profile Information</span>
+                    <CardTitle className="text-xl font-semibold text-gray-900 tracking-tight mb-1">
+                      Profile Information
                     </CardTitle>
-                    <CardDescription>Your registration details</CardDescription>
+                    <CardDescription className="text-sm text-gray-600 font-light">
+                      Your registration details
+                    </CardDescription>
                   </div>
                   {isStudent && (
                     <Button
@@ -180,7 +152,7 @@ export default function DashboardPage() {
                         // TODO: Implement edit profile functionality
                         alert("Edit profile functionality coming soon!");
                       }}
-                      className="text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300"
+                      className="text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-50"
                     >
                       Edit Profile
                     </Button>
@@ -417,25 +389,22 @@ export default function DashboardPage() {
 
           {/* Matches Card */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>
-                    {isStudent
-                      ? matches &&
-                        matches.length > 0 &&
-                        matches[0]?.type === "matched"
-                        ? "Your Matched Team"
-                        : "Available Teams"
-                      : isTeam
-                      ? matches && matches.length > 0
-                        ? "Your Matched Students"
-                        : "Available Students"
-                      : "All Users"}
-                  </span>
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-semibold text-gray-900 tracking-tight mb-1">
+                  {isStudent
+                    ? matches &&
+                      matches.length > 0 &&
+                      matches[0]?.type === "matched"
+                      ? "Your Matched Team"
+                      : "Available Teams"
+                    : isTeam
+                    ? matches && matches.length > 0
+                      ? "Your Matched Students"
+                      : "Available Students"
+                    : "All Users"}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm text-gray-600 font-light">
                   {isStudent
                     ? matches &&
                       matches.length > 0 &&
@@ -453,14 +422,23 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {!matches || matches.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-600 font-medium mb-1">
                       {isStudent
-                        ? "No teams available yet. Check back later!"
+                        ? "No teams available yet"
                         : isTeam
-                        ? "No students available yet. Check back later!"
-                        : "No users found."}
+                        ? "No students available yet"
+                        : "No users found"}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      {isStudent
+                        ? "Check back later for new team matches!"
+                        : isTeam
+                        ? "Check back later for new student matches!"
+                        : "No matches to display."}
                     </p>
                   </div>
                 ) : (
@@ -469,7 +447,7 @@ export default function DashboardPage() {
                       matches.map((match, index) => (
                         <div
                           key={index}
-                          className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                          className="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">

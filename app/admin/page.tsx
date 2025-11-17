@@ -13,7 +13,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getSession, getUserType, signOut, supabase } from "@/lib/auth";
+import { getSession, getUserType, signOut } from "@/lib/auth";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  updateDoc,
+  doc,
+  Timestamp,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { testStorageBucket } from "@/lib/utils";
 
 import {
@@ -41,19 +53,22 @@ import {
 // Database query functions
 const fetchStudents = async () => {
   try {
-    const { data, error } = await supabase
-      .from("students")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching students:", error);
-      return [];
-    }
+    const studentsQuery = query(
+      collection(db, "students"),
+      orderBy("created_at", "desc")
+    );
+    const snapshot = await getDocs(studentsQuery);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      created_at:
+        doc.data().created_at?.toDate?.()?.toISOString() ||
+        doc.data().created_at,
+    })) as any[];
 
     console.log("Fetched students data:", data);
     // Log resume_url data for each student
-    data?.forEach((student, index) => {
+    data?.forEach((student: any, index) => {
       console.log(
         `Student ${index + 1} (${student.name}): resume_url =`,
         student.resume_url
@@ -69,15 +84,18 @@ const fetchStudents = async () => {
 
 const fetchTeams = async () => {
   try {
-    const { data, error } = await supabase
-      .from("teams")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching teams:", error);
-      return [];
-    }
+    const teamsQuery = query(
+      collection(db, "teams"),
+      orderBy("created_at", "desc")
+    );
+    const snapshot = await getDocs(teamsQuery);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      created_at:
+        doc.data().created_at?.toDate?.()?.toISOString() ||
+        doc.data().created_at,
+    })) as any[];
 
     return data || [];
   } catch (error) {
@@ -88,35 +106,38 @@ const fetchTeams = async () => {
 
 const fetchMatches = async () => {
   try {
-    const { data, error } = await supabase
-      .from("students")
-      .select(
-        `
-        id,
-        name,
-        email,
-        school,
-        first_level,
-        grade,
-        time_commitment,
-        matched_team_id,
-        teams!inner(
-          id,
-          team_name,
-          email,
-          first_level,
-          time_commitment
-        )
-      `
-      )
-      .not("matched_team_id", "is", null);
+    // Get all students and filter for matched ones
+    // Note: Firestore doesn't support != null queries efficiently, so we fetch all and filter
+    const studentsQuery = query(
+      collection(db, "students"),
+      orderBy("created_at", "desc")
+    );
+    const studentsSnapshot = await getDocs(studentsQuery);
 
-    if (error) {
-      console.error("Error fetching matches:", error);
-      return [];
-    }
+    // Filter for matched students and fetch team data
+    const matchedStudents = studentsSnapshot.docs.filter(
+      (doc) => doc.data().matched_team_id != null
+    );
 
-    return data || [];
+    const matches = await Promise.all(
+      matchedStudents.map(async (studentDoc) => {
+        const studentData = { id: studentDoc.id, ...studentDoc.data() } as any;
+        if (studentData.matched_team_id) {
+          const teamRef = doc(db, "teams", studentData.matched_team_id);
+          const teamSnap = await getDoc(teamRef);
+
+          if (teamSnap.exists()) {
+            return {
+              ...studentData,
+              teams: { id: teamSnap.id, ...teamSnap.data() },
+            };
+          }
+        }
+        return null;
+      })
+    );
+
+    return matches.filter((m) => m !== null && m.teams);
   } catch (error) {
     console.error("Error fetching matches:", error);
     return [];
@@ -125,18 +146,12 @@ const fetchMatches = async () => {
 
 const createMatch = async (studentId: string, teamId: string) => {
   try {
-    const { error } = await supabase
-      .from("students")
-      .update({
-        matched_team_id: teamId,
-        is_matched: true,
-      })
-      .eq("id", studentId);
-
-    if (error) {
-      console.error("Error creating match:", error);
-      return { success: false, error: error.message };
-    }
+    const studentRef = doc(db, "students", studentId);
+    await updateDoc(studentRef, {
+      matched_team_id: teamId,
+      is_matched: true,
+      updated_at: Timestamp.now(),
+    });
 
     return { success: true };
   } catch (error: any) {
@@ -373,7 +388,7 @@ export default function AdminPage() {
       }
 
       // Check if user is admin
-      const { type, error: typeError } = await getUserType(session.user.id);
+      const { type, error: typeError } = await getUserType(session.user.uid);
 
       if (typeError || type !== "admin") {
         setIsAuthenticated(false);
@@ -422,11 +437,11 @@ export default function AdminPage() {
   // Show login screen if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="max-w-md mx-auto mt-20 space-y-8 p-8">
-          <div className="text-center">
-            <div className="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <Lock className="h-6 w-6 text-gray-600" />
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center">
+            <div className="mx-auto h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <Lock className="h-6 w-6 text-blue-600" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Admin Access Required
@@ -436,14 +451,14 @@ export default function AdminPage() {
             </p>
 
             {error && (
-              <div className="text-red-600 text-sm text-center mb-6">
+              <div className="bg-red-50 border border-red-200 rounded-md p-3 text-red-600 text-sm text-center mb-6">
                 {error}
               </div>
             )}
 
             <Button
               onClick={() => router.push("/login")}
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               size="lg"
             >
               Go to Login
@@ -629,82 +644,57 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Admin Dashboard
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
-                Manage student and team submissions
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4" />
-                <span>
-                  {isLoadingData ? "Loading..." : `${students.length} Students`}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <UserPlus className="h-4 w-4" />
-                <span>
-                  {isLoadingData ? "Loading..." : `${teams.length} Teams`}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                <span>
-                  {isLoadingData ? "Loading..." : `${matches.length} Matches`}
-                </span>
-              </div>
-              <Button
-                onClick={async () => {
-                  console.log("Testing storage bucket...");
-                  const result = await testStorageBucket();
-                  console.log("Storage test result:", result);
-                  if (result.success) {
-                    alert(
-                      `Storage bucket test successful! Found ${
-                        result.files?.length || 0
-                      } files.`
-                    );
-                  } else {
-                    alert(`Storage bucket test failed: ${result.error}`);
-                  }
-                }}
-                variant="outline"
-                size="sm"
-                className="ml-2"
-              >
-                Test Storage
-              </Button>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="ml-2"
-              >
-                <Lock className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+        {/* Stats Bar */}
+        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8">
+          <div className="flex items-center space-x-2">
+            <Users className="h-4 w-4" />
+            <span>
+              {isLoadingData ? "Loading..." : `${students.length} Students`}
+            </span>
           </div>
+          <div className="flex items-center space-x-2">
+            <UserPlus className="h-4 w-4" />
+            <span>
+              {isLoadingData ? "Loading..." : `${teams.length} Teams`}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>
+              {isLoadingData ? "Loading..." : `${matches.length} Matches`}
+            </span>
+          </div>
+          <Button
+            onClick={async () => {
+              console.log("Testing storage bucket...");
+              const result = await testStorageBucket();
+              console.log("Storage test result:", result);
+              if (result.success) {
+                alert(
+                  `Storage bucket test successful! Found ${
+                    result.files?.length || 0
+                  } files.`
+                );
+              } else {
+                alert(`Storage bucket test failed: ${result.error}`);
+              }
+            }}
+            variant="outline"
+            size="sm"
+          >
+            Test Storage
+          </Button>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tabs */}
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 bg-white p-1 rounded-lg shadow-sm mb-6">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 bg-white p-2 rounded-lg border border-gray-200 mb-8">
           <button
             onClick={() => setActiveTab("students")}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 py-3 px-6 rounded-md text-sm font-medium transition-colors ${
               activeTab === "students"
-                ? "bg-blue-500 text-white shadow-sm"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-gray-900 text-white"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             }`}
           >
             <UserPlus className="h-4 w-4 inline mr-2" />
@@ -735,7 +725,7 @@ export default function AdminPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label
@@ -905,13 +895,13 @@ export default function AdminPage() {
 
         {/* Content */}
         {activeTab === "students" && (
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-5 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">
                   Student Submissions
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 font-light">
                   {filteredStudents.length} students found
                 </p>
               </div>
@@ -921,7 +911,7 @@ export default function AdminPage() {
               {filteredStudents.map((student) => (
                 <div
                   key={student.id}
-                  className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="p-6 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200 last:border-b-0"
                   onClick={() => router.push(`/admin/student/${student.id}`)}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
@@ -1022,13 +1012,13 @@ export default function AdminPage() {
         )}
 
         {activeTab === "teams" && (
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-5 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">
                   Team Submissions
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 font-light">
                   {filteredTeams.length} teams found
                 </p>
               </div>
@@ -1038,7 +1028,7 @@ export default function AdminPage() {
               {filteredTeams.map((team) => (
                 <div
                   key={team.id}
-                  className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="p-6 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200 last:border-b-0"
                   onClick={() => router.push(`/admin/team/${team.id}`)}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
@@ -1149,13 +1139,13 @@ export default function AdminPage() {
         )}
 
         {activeTab === "matches" && (
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="px-6 py-5 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">
                   Current Matches
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 font-light">
                   {matches.length} matches made
                 </p>
               </div>
@@ -1264,7 +1254,7 @@ export default function AdminPage() {
             <Button
               onClick={confirmMatch}
               disabled={!selectedStudent || !selectedTeam || isCreatingMatch}
-              className="shadow-lg"
+              className="shadow-lg bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               {isCreatingMatch ? (
                 <>
@@ -1283,15 +1273,15 @@ export default function AdminPage() {
 
         {/* Match Modal */}
         {showMatchModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-6 max-w-4xl w-full mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Match Information
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {/* Student Info */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-blue-50/50 rounded-lg p-4 border border-blue-100">
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                     <UserPlus className="h-4 w-4 mr-2" />
                     Student
@@ -1338,7 +1328,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Team Info */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-red-50/50 rounded-lg p-4 border border-red-100">
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                     <Users className="h-4 w-4 mr-2" />
                     Team

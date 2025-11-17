@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus, Menu, X, LogIn, LogOut, Bug } from "lucide-react";
 import Image from "next/image";
-import { getSession, signOut, getUserProfile, supabase } from "@/lib/auth";
+import { getSession, signOut, getUserProfile, onAuthStateChanged, auth } from "@/lib/auth";
 
 export function NavigationHeader() {
   const pathname = usePathname();
@@ -15,6 +15,7 @@ export function NavigationHeader() {
   const isHomePage = pathname === "/";
   const isLoginPage = pathname === "/login";
   const isDashboardPage = pathname === "/dashboard";
+  const isAdminPage = pathname === "/admin";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
@@ -66,7 +67,7 @@ Additional Details:
 
       if (session) {
         // Get user profile to determine type
-        const { profile } = await getUserProfile(session.user.id);
+        const { profile } = await getUserProfile(session.user.uid);
         if (profile) {
           setUserType(profile.type);
         }
@@ -77,13 +78,11 @@ Additional Details:
     checkAuth();
 
     // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
-      setIsAuthenticated(!!session);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setIsAuthenticated(!!user);
 
-      if (session) {
-        const { profile } = await getUserProfile(session.user.id);
+      if (user) {
+        const { profile } = await getUserProfile(user.uid);
         if (profile) {
           setUserType(profile.type);
         }
@@ -92,13 +91,13 @@ Additional Details:
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   return (
-    <header className="glass-effect sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
@@ -111,7 +110,7 @@ Additional Details:
                 style={{ width: "auto", height: "auto" }}
               />
               {!isHomePage && (
-                <span className="ml-2 sm:ml-3 text-lg sm:text-xl font-bold text-gray-800">
+                <span className="ml-3 text-lg font-semibold text-gray-900">
                   TeamMatch
                 </span>
               )}
@@ -129,7 +128,7 @@ Additional Details:
             >
               <Button
                 variant="outline"
-                className="border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 font-semibold py-2 px-4 lg:py-3 lg:px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2 text-sm lg:text-base"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm"
               >
                 <Bug className="h-4 w-4" />
                 <span className="hidden lg:inline">Bug Report</span>
@@ -139,25 +138,37 @@ Additional Details:
 
             {!isLoading && !isLoginPage && !isAuthenticated && (
               <Link href="/login">
-                <Button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 lg:py-3 lg:px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2 text-sm lg:text-base">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm">
                   <LogIn className="h-4 w-4" />
-                  <span className="hidden lg:inline">Log In</span>
-                  <span className="lg:hidden">Log In</span>
+                  <span>Log In</span>
                 </Button>
               </Link>
             )}
 
-            {!isLoading && isAuthenticated && userType === "admin" && (
+            {!isLoading && isAuthenticated && (isDashboardPage || isAdminPage) && (
+              <Button
+                onClick={async () => {
+                  await signOut();
+                  window.location.href = "/";
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Log Out</span>
+              </Button>
+            )}
+
+            {!isLoading && isAuthenticated && userType === "admin" && !isAdminPage && (
               <Link href="/admin">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 lg:py-3 lg:px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm lg:text-base">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
                   Admin
                 </Button>
               </Link>
             )}
 
-            {!isLoading && isAuthenticated && userType !== "admin" && (
+            {!isLoading && isAuthenticated && userType !== "admin" && !isDashboardPage && (
               <Link href="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 lg:py-3 lg:px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm lg:text-base">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
                   Dashboard
                 </Button>
               </Link>
@@ -183,8 +194,8 @@ Additional Details:
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-sm">
-            <div className="px-4 py-4 space-y-3">
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-6 py-4 space-y-3">
               {/* Bug Report Button - Mobile */}
               <a
                 href={bugReportUrl || "#"}
@@ -196,7 +207,7 @@ Additional Details:
               >
                 <Button
                   variant="outline"
-                  className="w-full border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
                 >
                   <Bug className="h-4 w-4" />
                   <span>Bug Report</span>
@@ -205,24 +216,37 @@ Additional Details:
 
               {!isLoading && !isLoginPage && !isAuthenticated && (
                 <Link href="/login">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center space-x-2">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                     <LogIn className="h-4 w-4" />
                     <span>Log In</span>
                   </Button>
                 </Link>
               )}
 
-              {!isLoading && isAuthenticated && userType === "admin" && (
+              {!isLoading && isAuthenticated && (isDashboardPage || isAdminPage) && (
+                <Button
+                  onClick={async () => {
+                    await signOut();
+                    window.location.href = "/";
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Log Out</span>
+                </Button>
+              )}
+
+              {!isLoading && isAuthenticated && userType === "admin" && !isAdminPage && (
                 <Link href="/admin">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
                     Admin
                   </Button>
                 </Link>
               )}
 
-              {!isLoading && isAuthenticated && userType !== "admin" && (
+              {!isLoading && isAuthenticated && userType !== "admin" && !isDashboardPage && (
                 <Link href="/dashboard">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
                     Dashboard
                   </Button>
                 </Link>

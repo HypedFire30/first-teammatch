@@ -1,12 +1,13 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { supabase } from "./supabase"
+import { ref, uploadBytes, getDownloadURL, deleteObject, listAll } from "firebase/storage"
+import { storage } from "./firebase"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// File upload utility for Supabase Storage
+// File upload utility for Firebase Storage
 export async function uploadFile(
   file: File,
   bucket: string = 'resumes',
@@ -18,20 +19,11 @@ export async function uploadFile(
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
     const filePath = `${folder}/${fileName}`
 
-    // Upload file to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+    // Upload file to Firebase Storage
+    const storageRef = ref(storage, filePath)
+    await uploadBytes(storageRef, file)
 
-    if (error) {
-      console.error('Upload error:', error)
-      return { filePath: null, error: error.message }
-    }
-
-    return { filePath: data.path, error: null }
+    return { filePath, error: null }
   } catch (error: any) {
     console.error('File upload error:', error)
     return { filePath: null, error: error.message }
@@ -39,28 +31,25 @@ export async function uploadFile(
 }
 
 // Get public URL for uploaded file
-export function getFileUrl(filePath: string, bucket: string = 'resumes'): string {
-  const { data } = supabase.storage
-    .from(bucket)
-    .getPublicUrl(filePath)
-  
-  return data.publicUrl
+export async function getFileUrl(filePath: string, bucket: string = 'resumes'): Promise<string> {
+  try {
+    const storageRef = ref(storage, filePath)
+    const url = await getDownloadURL(storageRef)
+    return url
+  } catch (error: any) {
+    console.error('Error getting file URL:', error)
+    return ''
+  }
 }
 
-// Delete file from Supabase Storage
+// Delete file from Firebase Storage
 export async function deleteFile(
   filePath: string,
   bucket: string = 'resumes'
 ): Promise<{ error: string | null }> {
   try {
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([filePath])
-
-    if (error) {
-      console.error('Delete error:', error)
-      return { error: error.message }
-    }
+    const storageRef = ref(storage, filePath)
+    await deleteObject(storageRef)
 
     return { error: null }
   } catch (error: any) {
@@ -73,21 +62,12 @@ export async function deleteFile(
 export async function testStorageBucket(bucket: string = 'resumes'): Promise<{ success: boolean; error?: string; files?: any[] }> {
   try {
     // Try to list files in the bucket
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .list('', {
-        limit: 100,
-        offset: 0
-      })
+    const storageRef = ref(storage, bucket)
+    const result = await listAll(storageRef)
 
-    if (error) {
-      console.error('Storage bucket test error:', error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, files: data }
+    return { success: true, files: result.items.map(item => ({ name: item.name, fullPath: item.fullPath })) }
   } catch (error: any) {
     console.error('Storage bucket test error:', error)
     return { success: false, error: error.message }
   }
-} 
+}

@@ -24,8 +24,9 @@ import {
   Star,
   Mail as MailIcon,
 } from "lucide-react";
-import { supabase } from "@/lib/auth";
 import { getResumeUrl } from "@/lib/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface Student {
   id: string;
@@ -73,31 +74,31 @@ export default function StudentDetailPage() {
     try {
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("students")
-        .select(
-          `
-          *,
-          teams (
-            id,
-            team_name,
-            email,
-            first_level,
-            time_commitment,
-            grade_range_min,
-            grade_range_max,
-            zip_code
-          )
-        `
-        )
-        .eq("id", params.id)
-        .single();
+      const studentRef = doc(db, "students", params.id as string);
+      const studentSnap = await getDoc(studentRef);
 
-      if (error) {
-        console.error("Error fetching student:", error);
+      if (!studentSnap.exists()) {
+        console.error("Student not found");
         setError("Failed to load student information");
         return;
       }
+
+      const studentData = { id: studentSnap.id, ...studentSnap.data() } as any;
+      
+      // Fetch team data if matched
+      let teamData = null;
+      if (studentData.matched_team_id) {
+        const teamRef = doc(db, "teams", studentData.matched_team_id);
+        const teamSnap = await getDoc(teamRef);
+        if (teamSnap.exists()) {
+          teamData = { id: teamSnap.id, ...teamSnap.data() };
+        }
+      }
+
+      const data = {
+        ...studentData,
+        teams: teamData
+      };
 
       setStudent(data);
     } catch (error) {
@@ -108,9 +109,9 @@ export default function StudentDetailPage() {
     }
   };
 
-  const handleResumeClick = () => {
+  const handleResumeClick = async () => {
     if (student?.resume_url) {
-      const resumeUrl = getResumeUrl(student.resume_url);
+      const resumeUrl = await getResumeUrl(student.resume_url);
       window.open(resumeUrl, "_blank");
     } else {
       alert("No resume uploaded");
@@ -129,7 +130,7 @@ export default function StudentDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading student information...</p>
@@ -140,8 +141,8 @@ export default function StudentDetailPage() {
 
   if (error || !student) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <div className="text-red-600 mb-4">
             <UserPlus className="h-12 w-12 mx-auto" />
           </div>
@@ -151,7 +152,7 @@ export default function StudentDetailPage() {
           <p className="text-gray-600 mb-4">
             {error || "The requested student could not be found."}
           </p>
-          <Button onClick={handleBackClick} variant="outline">
+          <Button onClick={handleBackClick} variant="outline" className="border-gray-300 hover:bg-gray-50">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Admin
           </Button>
@@ -161,13 +162,13 @@ export default function StudentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button onClick={handleBackClick} variant="outline" size="sm">
+              <Button onClick={handleBackClick} variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Admin
               </Button>
@@ -200,7 +201,7 @@ export default function StudentDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <UserPlus className="h-5 w-5 mr-2" />
@@ -270,7 +271,7 @@ export default function StudentDetailPage() {
             </Card>
 
             {/* FIRST Program Information */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Award className="h-5 w-5 mr-2" />
@@ -314,7 +315,7 @@ export default function StudentDetailPage() {
             </Card>
 
             {/* Long Answer Responses */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Star className="h-5 w-5 mr-2" />
@@ -346,14 +347,14 @@ export default function StudentDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Actions */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   onClick={handleEmailClick}
-                  className="w-full"
+                  className="w-full border-gray-300 hover:bg-gray-50"
                   variant="outline"
                 >
                   <MailIcon className="h-4 w-4 mr-2" />
@@ -362,7 +363,7 @@ export default function StudentDetailPage() {
                 {student.resume_url && (
                   <Button
                     onClick={handleResumeClick}
-                    className="w-full"
+                    className="w-full border-gray-300 hover:bg-gray-50"
                     variant="outline"
                   >
                     <FileText className="h-4 w-4 mr-2" />
@@ -374,7 +375,7 @@ export default function StudentDetailPage() {
 
             {/* Match Information */}
             {student.is_matched && student.teams && (
-              <Card>
+              <Card className="border border-gray-100 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
@@ -404,7 +405,7 @@ export default function StudentDetailPage() {
             )}
 
             {/* Registration Info */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle>Registration Info</CardTitle>
               </CardHeader>

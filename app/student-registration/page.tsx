@@ -4,9 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -16,9 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { UserPlus, Upload, CheckCircle, Clock, ArrowRight } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase";
+import { CheckCircle } from "lucide-react";
 import { signUp } from "@/lib/auth";
 import { PasswordInput } from "@/components/ui/password-input";
 
@@ -81,10 +78,6 @@ export default function StudentRegistrationPage() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [timeCommitment, setTimeCommitment] = useState([10]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
-    "right"
-  );
   const [stepErrors, setStepErrors] = useState<{ [key: number]: string }>({});
 
   const {
@@ -101,11 +94,11 @@ export default function StudentRegistrationPage() {
     },
   });
 
-  // Set the time commitment value when component mounts
   useEffect(() => {
     setValue("timeCommitment", 10);
     setValue("areasOfInterest", []);
-  }, [setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAreaToggle = (area: string) => {
     const newSelectedAreas = selectedAreas.includes(area)
@@ -127,94 +120,84 @@ export default function StudentRegistrationPage() {
   };
 
   const handleTimeCommitmentChange = (value: number[]) => {
-    console.log("Time commitment changed to:", value[0]);
     setTimeCommitment(value);
     setValue("timeCommitment", value[0]);
   };
 
-  // Validation functions for each step
   const validateStep = (step: number): boolean => {
     const currentValues = watch();
     let isValid = true;
     const newStepErrors = { ...stepErrors };
 
     switch (step) {
-      case 0: // Name
-        if (!currentValues.firstName?.trim()) {
-          newStepErrors[0] = "First name is required";
-          isValid = false;
-        } else if (!currentValues.lastName?.trim()) {
-          newStepErrors[0] = "Last name is required";
+      case 0:
+        if (
+          !currentValues.firstName?.trim() ||
+          !currentValues.lastName?.trim()
+        ) {
+          newStepErrors[0] = "Please enter your name";
           isValid = false;
         } else {
           delete newStepErrors[0];
         }
         break;
-
-      case 1: // Email
+      case 1:
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!currentValues.email?.trim()) {
-          newStepErrors[1] = "Email is required";
-          isValid = false;
-        } else if (!emailRegex.test(currentValues.email)) {
-          newStepErrors[1] = "Please enter a valid email address";
+        if (
+          !currentValues.email?.trim() ||
+          !emailRegex.test(currentValues.email)
+        ) {
+          newStepErrors[1] = "Please enter a valid email";
           isValid = false;
         } else {
           delete newStepErrors[1];
         }
         break;
-
-      case 2: // Password
+      case 2:
         const password = currentValues.password || "";
-        if (password.length < 8) {
-          newStepErrors[2] = "Password must be at least 8 characters";
-          isValid = false;
-        } else if (!/[A-Z]/.test(password)) {
+        if (
+          password.length < 8 ||
+          !/[A-Z]/.test(password) ||
+          !/\d/.test(password)
+        ) {
           newStepErrors[2] =
-            "Password must contain at least one uppercase letter";
-          isValid = false;
-        } else if (!/\d/.test(password)) {
-          newStepErrors[2] = "Password must contain at least one number";
+            "Password must be 8+ chars with uppercase and number";
           isValid = false;
         } else {
           delete newStepErrors[2];
         }
         break;
-
-      case 3: // Zip Code
-        if (!currentValues.zipCode?.trim()) {
-          newStepErrors[3] = "Zip code is required";
-          isValid = false;
-        } else if (currentValues.zipCode.length < 5) {
+      case 3:
+        if (
+          !currentValues.zipCode?.trim() ||
+          currentValues.zipCode.length < 5
+        ) {
           newStepErrors[3] = "Please enter a valid zip code";
           isValid = false;
         } else {
           delete newStepErrors[3];
         }
         break;
-
-      case 4: // FIRST Level
+      case 4:
         if (!currentValues.firstLevel?.trim()) {
-          newStepErrors[4] = "Please select your FIRST level";
+          newStepErrors[4] = "Please select a level";
           isValid = false;
         } else {
           delete newStepErrors[4];
         }
         break;
-
-      case 5: // Areas of Interest
+      case 5:
         if (
           !currentValues.areasOfInterest ||
           currentValues.areasOfInterest.length === 0
         ) {
-          newStepErrors[5] = "Please select at least one area of interest";
+          newStepErrors[5] = "Please select at least one";
           isValid = false;
         } else {
           delete newStepErrors[5];
         }
         break;
-
-      case 6: // Grade
+      case 6:
         const grade = currentValues.grade;
         if (!grade || grade < 1 || grade > 12) {
           newStepErrors[6] = "Please enter a valid grade (1-12)";
@@ -223,44 +206,37 @@ export default function StudentRegistrationPage() {
           delete newStepErrors[6];
         }
         break;
-
-      case 7: // School
+      case 7:
         if (!currentValues.school?.trim()) {
-          newStepErrors[7] = "School name is required";
+          newStepErrors[7] = "Please enter your school";
           isValid = false;
         } else {
           delete newStepErrors[7];
         }
         break;
-
-      case 8: // Time Commitment (always valid since slider has default value)
+      case 8:
         delete newStepErrors[8];
         break;
-
-      case 9: // Resume (optional)
+      case 9:
         delete newStepErrors[9];
         break;
-
-      case 10: // Impressive Things
-        if (!currentValues.impressiveThings?.trim()) {
-          newStepErrors[10] = "Please describe your impressive achievements";
-          isValid = false;
-        } else if (currentValues.impressiveThings.trim().length < 10) {
-          newStepErrors[10] =
-            "Please provide more details (at least 10 characters)";
+      case 10:
+        if (
+          !currentValues.impressiveThings?.trim() ||
+          currentValues.impressiveThings.trim().length < 10
+        ) {
+          newStepErrors[10] = "Please provide more details";
           isValid = false;
         } else {
           delete newStepErrors[10];
         }
         break;
-
-      case 11: // Why Join Team
-        if (!currentValues.whyJoinTeam?.trim()) {
-          newStepErrors[11] = "Please explain why you want to join a team";
-          isValid = false;
-        } else if (currentValues.whyJoinTeam.trim().length < 10) {
-          newStepErrors[11] =
-            "Please provide more details (at least 10 characters)";
+      case 11:
+        if (
+          !currentValues.whyJoinTeam?.trim() ||
+          currentValues.whyJoinTeam.trim().length < 10
+        ) {
+          newStepErrors[11] = "Please provide more details";
           isValid = false;
         } else {
           delete newStepErrors[11];
@@ -273,39 +249,18 @@ export default function StudentRegistrationPage() {
   };
 
   const nextStep = () => {
-    // Validate current step before proceeding
     if (!validateStep(currentStep)) {
-      return; // Don't proceed if validation fails
+      return;
     }
-
-    setSlideDirection("right");
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentStep((prev) => prev + 1);
-      setIsTransitioning(false);
-    }, 300);
+    setCurrentStep((prev) => prev + 1);
   };
 
   const prevStep = () => {
-    setSlideDirection("left");
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentStep((prev) => prev - 1);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  const goToStep = (step: number) => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentStep(step);
-      setIsTransitioning(false);
-    }, 300);
+    setCurrentStep((prev) => prev - 1);
   };
 
   const onSubmit = async (data: StudentRegistrationForm) => {
-    console.log("=== onSubmit FUNCTION CALLED ===");
-    console.log("Submitting student form:", data);
+    if (isSubmitting) return; // Prevent double submission
 
     try {
       const { user, error: authError } = await signUp(
@@ -320,7 +275,7 @@ export default function StudentRegistrationPage() {
           grade: data.grade,
           school: data.school,
           time_commitment: data.timeCommitment,
-          resume_file: resumeFile, // Pass the actual file object
+          resume_file: resumeFile,
           impressive_things: data.impressiveThings,
           why_join_team: data.whyJoinTeam,
         },
@@ -328,357 +283,243 @@ export default function StudentRegistrationPage() {
       );
 
       if (authError) {
-        console.error("Auth error:", authError);
         alert("Registration failed: " + authError.message);
         return;
       }
 
-      console.log("Student registered successfully:", user);
       setIsSubmitted(true);
     } catch (error: any) {
-      console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
     }
   };
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="text-center max-w-md w-full">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              You're Signed Up!
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Thank you for signing up. Check your email for a confirmation.
-            </p>
-            <Button
-              onClick={() => {
-                // Force a page refresh to ensure navigation updates properly
-                window.location.href = "/dashboard";
-              }}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Go to My Account
-            </Button>
-          </div>
+      <div
+        className="flex items-center justify-center overflow-hidden bg-white"
+        style={{ height: "calc(100vh - 4rem)" }}
+      >
+        <div className="text-center max-w-md w-full px-6 sm:px-8 lg:px-12">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            You're Signed Up!
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Check your email for a confirmation.
+          </p>
+          <button
+            onClick={() => {
+              window.location.href = "/dashboard";
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Go to Dashboard
+          </button>
         </div>
       </div>
     );
   }
 
+  const getQuestion = (step: number) => {
+    const questions = [
+      "What's your name?",
+      "What's your email?",
+      "Create a password",
+      "What's your zip code?",
+      "What's your FIRST experience level?",
+      "What interests you most?",
+      "What grade are you in?",
+      "What school do you attend?",
+      "How many hours per week can you commit?",
+      "Upload your resume (optional)",
+      "What are three impressive things you've done?",
+      "Why do you want to join a team?",
+    ];
+    return questions[step] || "";
+  };
+
+  const totalSteps = 12;
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-white via-blue-50 to-red-100">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
+    <div
+      className="bg-white flex items-center justify-center overflow-hidden"
+      style={{ height: "calc(100vh - 4rem)" }}
+    >
+      <div className="w-full max-w-3xl px-6 sm:px-8 lg:px-12">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="relative">
+            {/* Progress indicator */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between text-sm text-gray-400 mb-3">
+                <span>
+                  Question {currentStep + 1} of {totalSteps}
+                </span>
+                <span>
+                  {Math.round(((currentStep + 1) / totalSteps) * 100)}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                  style={{
+                    width: `${((currentStep + 1) / totalSteps) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
 
-      <div className="relative max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl mb-6 sm:mb-8 shadow-2xl">
-            <UserPlus className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4 sm:mb-6 px-4">
-            Find Your Perfect Team
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-            Join thousands of students who've found their robotics family. Let's
-            discover the team that matches your passion and skills.
-          </p>
-        </div>
+            {/* Question */}
+            <div className="mb-8 transition-all duration-300 ease-in-out form-step-enter">
+              <h2 className="text-3xl font-semibold text-gray-900 mb-8">
+                {getQuestion(currentStep)}
+              </h2>
 
-        {/* Progress Bar */}
-        <div className="mb-8 sm:mb-12">
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${((currentStep + 1) / 12) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Form Container */}
-        <div className="min-h-[500px] sm:min-h-[600px] relative overflow-hidden">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div
-              className={`transition-all duration-300 ease-out ${
-                isTransitioning
-                  ? slideDirection === "right"
-                    ? "opacity-0 transform -translate-x-full"
-                    : "opacity-0 transform translate-x-full"
-                  : "opacity-100 transform translate-x-0"
-              }`}
-            >
-              {currentStep === 0 && (
-                <div className="text-center">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                    What's your name?
-                  </h2>
-                  <p className="text-gray-600 mb-6 sm:mb-8 px-4">
-                    Let's start with the basics
-                  </p>
-                  <div className="max-w-md mx-auto px-4 space-y-4">
+              {/* Input fields */}
+              <div className="space-y-4">
+                {currentStep === 0 && (
+                  <>
                     <Input
                       {...register("firstName")}
-                      placeholder="Enter your first name"
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[0]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
+                      placeholder="First name"
+                      className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
                       autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && watch("firstName")) {
+                          e.preventDefault();
+                          document.getElementById("lastName")?.focus();
+                        }
+                      }}
                     />
                     <Input
                       {...register("lastName")}
-                      placeholder="Enter your last name"
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[0]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
+                      id="lastName"
+                      placeholder="Last name"
+                      className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
                     />
-                    {stepErrors[0] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3">
-                        {stepErrors[0]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                  </>
+                )}
 
-              {currentStep === 1 && (
-                <div className="text-center">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                    What's your email?
-                  </h2>
-                  <p className="text-gray-600 mb-6 sm:mb-8 px-4">
-                    We'll use this to connect you with teams
-                  </p>
-                  <div className="max-w-md mx-auto px-4">
-                    <Input
-                      type="email"
-                      {...register("email")}
-                      placeholder="Enter your email address"
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[1]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      autoFocus
-                    />
-                    {stepErrors[1] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[1]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div className="text-center">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                    Create your password
-                  </h2>
-                  <p className="text-gray-600 mb-6 sm:mb-8 px-4">
-                    This will be your login password for your account
-                  </p>
-                  <div className="max-w-md mx-auto px-4">
-                    <PasswordInput
-                      value={watch("password") || ""}
-                      onChange={(value) => setValue("password", value)}
-                      placeholder="Enter your password"
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[2]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      error={stepErrors[2] || errors.password?.message}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 3 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    Where are you located?
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    We'll find teams near you
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <Input
-                      {...register("zipCode")}
-                      placeholder="Enter your zip code"
-                      className={`w-full px-6 py-4 text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[3]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      autoFocus
-                    />
-                    {stepErrors[3] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[3]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 4 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    What's your FIRST experience level?
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    This helps us match you with the right team
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <Select
-                      value={watch("firstLevel")}
-                      onValueChange={(value) =>
-                        setValue("firstLevel", value as any)
+                {currentStep === 1 && (
+                  <Input
+                    type="email"
+                    {...register("email")}
+                    placeholder="your@email.com"
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
                       }
-                    >
-                      <SelectTrigger
-                        className={`w-full px-6 py-4 text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-lg ${
-                          stepErrors[4]
-                            ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                            : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                        }`}
-                      >
-                        <SelectValue placeholder="Select your FIRST level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {firstLevels.map((level) => (
-                          <SelectItem key={level.value} value={level.value}>
-                            {level.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {stepErrors[4] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[4]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                    }}
+                  />
+                )}
 
-              {currentStep === 5 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    What interests you most?
-                  </h2>
-                  <p className="text-gray-600 mb-8">Select all that apply</p>
-                  <div className="max-w-md mx-auto space-y-4">
+                {currentStep === 2 && (
+                  <PasswordInput
+                    value={watch("password") || ""}
+                    onChange={(value) => setValue("password", value)}
+                    placeholder="Enter password"
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                    error={stepErrors[2] || errors.password?.message}
+                  />
+                )}
+
+                {currentStep === 3 && (
+                  <Input
+                    {...register("zipCode")}
+                    placeholder="12345"
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                  />
+                )}
+
+                {currentStep === 4 && (
+                  <Select
+                    value={watch("firstLevel")}
+                    onValueChange={(value) => {
+                      setValue("firstLevel", value as any);
+                      setTimeout(() => nextStep(), 300);
+                    }}
+                  >
+                    <SelectTrigger className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 h-auto">
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {firstLevels.map((level) => (
+                        <SelectItem key={level.value} value={level.value}>
+                          {level.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {currentStep === 5 && (
+                  <div className="space-y-3">
                     {areasOfInterest.map((area) => (
-                      <div
+                      <label
                         key={area.value}
-                        className={`flex items-center space-x-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                          selectedAreas.includes(area.value)
-                            ? "border-blue-500 bg-blue-50"
-                            : stepErrors[5]
-                            ? "border-red-300 hover:border-red-400"
-                            : "border-gray-200 hover:border-blue-300"
-                        }`}
-                        onClick={() => handleAreaToggle(area.value)}
+                        className="flex items-center space-x-3 cursor-pointer"
                       >
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <Checkbox
-                            checked={selectedAreas.includes(area.value)}
-                            onCheckedChange={() => handleAreaToggle(area.value)}
-                          />
-                        </div>
-                        <span className="text-lg font-medium">
-                          {area.label}
-                        </span>
-                      </div>
+                        <Checkbox
+                          checked={selectedAreas.includes(area.value)}
+                          onCheckedChange={() => handleAreaToggle(area.value)}
+                        />
+                        <span className="text-lg">{area.label}</span>
+                      </label>
                     ))}
-                    {stepErrors[5] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[5]}
-                      </div>
-                    )}
                   </div>
-                </div>
-              )}
+                )}
 
-              {currentStep === 6 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    What grade are you in?
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    This helps teams understand your academic level
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <Input
-                      type="number"
-                      {...register("grade", { valueAsNumber: true })}
-                      placeholder="Enter your grade"
-                      className={`w-full px-6 py-4 text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[6]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      autoFocus
-                    />
-                    {stepErrors[6] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[6]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                {currentStep === 6 && (
+                  <Input
+                    type="number"
+                    {...register("grade", { valueAsNumber: true })}
+                    placeholder="9"
+                    min="1"
+                    max="12"
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                  />
+                )}
 
-              {currentStep === 7 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    What school do you attend?
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    This helps teams understand your background
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <Input
-                      {...register("school")}
-                      placeholder="Enter your school name"
-                      className={`w-full px-6 py-4 text-xl border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm text-center shadow-lg ${
-                        stepErrors[7]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      autoFocus
-                    />
-                    {stepErrors[7] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[7]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                {currentStep === 7 && (
+                  <Input
+                    {...register("school")}
+                    placeholder="School name"
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                  />
+                )}
 
-              {currentStep === 8 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    How much time can you commit?
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    Teams want to know your availability
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <div className="text-4xl font-bold text-blue-600 mb-4">
+                {currentStep === 8 && (
+                  <div className="space-y-4">
+                    <div className="text-3xl font-light text-gray-900">
                       {timeCommitment[0]} hours/week
                     </div>
                     <Slider
@@ -687,177 +528,92 @@ export default function StudentRegistrationPage() {
                       max={30}
                       min={1}
                       step={1}
-                      className="w-full mb-4"
+                      className="w-full"
                     />
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-gray-400">
                       <span>1 hour</span>
                       <span>30+ hours</span>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {currentStep === 9 && (
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                    Upload your resume (optional)
-                  </h2>
-                  <p className="text-gray-600 mb-8">
-                    Help teams learn more about your experience
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 hover:border-blue-500 transition-colors duration-300">
-                      <div className="text-center">
-                        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <div className="text-lg font-medium text-gray-900 mb-2">
-                          {resumeFile ? resumeFile.name : "Choose a file"}
-                        </div>
-                        <p className="text-sm text-gray-500 mb-4">
-                          PDF, DOC, or DOCX (max 10MB)
-                        </p>
-                        <Input
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={handleFileChange}
-                          className="hidden"
-                          id="resume-upload"
-                        />
-                        <Label
-                          htmlFor="resume-upload"
-                          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl cursor-pointer transition-all duration-300 inline-block"
-                        >
-                          {resumeFile ? "Change File" : "Browse Files"}
-                        </Label>
-                      </div>
-                    </div>
-                    {resumeFile && (
-                      <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                        <div className="flex items-center">
-                          <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                          <span className="text-green-800 font-medium">
-                            {resumeFile.name} selected
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 10 && (
-                <div className="text-center">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                    What are three impressive things you've done?
-                  </h2>
-                  <p className="text-gray-600 mb-6 sm:mb-8 px-4">
-                    Help teams understand your achievements
-                  </p>
-                  <div className="max-w-2xl mx-auto px-4">
-                    <Textarea
-                      {...register("impressiveThings")}
-                      placeholder="Describe three impressive accomplishments, projects, or experiences you've had..."
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-lg ${
-                        stepErrors[10]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      rows={6}
-                      autoFocus
+                {currentStep === 9 && (
+                  <div>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="resume-upload"
                     />
-                    {stepErrors[10] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[10]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 11 && (
-                <div className="text-center">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                    Why do you want to join a team?
-                  </h2>
-                  <p className="text-gray-600 mb-6 sm:mb-8 px-4">
-                    Help teams understand your motivation
-                  </p>
-                  <div className="max-w-2xl mx-auto px-4">
-                    <Textarea
-                      {...register("whyJoinTeam")}
-                      placeholder="Explain your motivation for joining a FIRST Robotics team. Think about the qualities teams are looking for in prospects."
-                      className={`w-full px-4 sm:px-6 py-3 sm:py-4 text-lg border-2 rounded-2xl focus:ring-4 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-lg ${
-                        stepErrors[11]
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                          : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                      }`}
-                      rows={6}
-                      autoFocus
-                    />
-                    {stepErrors[11] && (
-                      <div className="text-red-600 text-sm font-medium bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                        {stepErrors[11]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </form>
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-center space-x-4 mt-8">
-            {currentStep > 0 && (
-              <Button
-                onClick={prevStep}
-                variant="outline"
-                className="px-6 py-4 rounded-2xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-300"
-              >
-                Back
-              </Button>
-            )}
-
-            {currentStep < 11 ? (
-              <Button
-                onClick={nextStep}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-8 rounded-2xl text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Continue
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => {
-                  console.log("Start Your Journey button clicked");
-                  console.log("Form errors:", errors);
-                  console.log("Form values:", watch());
-                  console.log(
-                    "Is form valid:",
-                    Object.keys(errors).length === 0
-                  );
-
-                  // Validate the final step before submitting
-                  if (validateStep(11)) {
-                    handleSubmit(onSubmit)();
-                  }
-                }}
-                disabled={isSubmitting}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-8 rounded-2xl text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                    Creating Your Profile...
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span>Start Your Journey</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <label
+                      htmlFor="resume-upload"
+                      className="block text-lg text-blue-600 hover:text-blue-700 cursor-pointer border-b-2 border-blue-600 pb-1 inline-block"
+                    >
+                      {resumeFile ? resumeFile.name : "Choose file (optional)"}
+                    </label>
                   </div>
                 )}
-              </Button>
-            )}
+
+                {currentStep === 10 && (
+                  <Textarea
+                    {...register("impressiveThings")}
+                    placeholder="Describe your achievements..."
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors resize-none"
+                    rows={4}
+                    autoFocus
+                  />
+                )}
+
+                {currentStep === 11 && (
+                  <Textarea
+                    {...register("whyJoinTeam")}
+                    placeholder="Explain your motivation..."
+                    className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors resize-none"
+                    rows={4}
+                    autoFocus
+                  />
+                )}
+
+                {stepErrors[currentStep] && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {stepErrors[currentStep]}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between mt-8">
+              <button
+                type="button"
+                onClick={prevStep}
+                disabled={currentStep === 0}
+                className="text-lg text-gray-600 hover:text-gray-900 disabled:opacity-0 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                ← Back
+              </button>
+
+              {currentStep < 11 ? (
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="text-lg text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                >
+                  Next →
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="text-lg text-blue-600 hover:text-blue-700 font-semibold disabled:opacity-50 transition-colors"
+                >
+                  {isSubmitting ? "Submitting..." : "Submit →"}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

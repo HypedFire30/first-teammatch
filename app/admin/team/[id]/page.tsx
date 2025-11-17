@@ -21,7 +21,8 @@ import {
   CheckCircle,
   Clock as ClockIcon,
 } from "lucide-react";
-import { supabase } from "@/lib/auth";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface Team {
   id: string;
@@ -65,30 +66,32 @@ export default function TeamDetailPage() {
     try {
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("teams")
-        .select(
-          `
-          *,
-          students (
-            id,
-            name,
-            email,
-            school,
-            first_level,
-            grade,
-            time_commitment
-          )
-        `
-        )
-        .eq("id", params.id)
-        .single();
+      const teamRef = doc(db, "teams", params.id as string);
+      const teamSnap = await getDoc(teamRef);
 
-      if (error) {
-        console.error("Error fetching team:", error);
+      if (!teamSnap.exists()) {
+        console.error("Team not found");
         setError("Failed to load team information");
         return;
       }
+
+      const teamData = { id: teamSnap.id, ...teamSnap.data() };
+      
+      // Fetch matched students
+      const studentsQuery = query(
+        collection(db, "students"),
+        where("matched_team_id", "==", params.id)
+      );
+      const studentsSnapshot = await getDocs(studentsQuery);
+      const students = studentsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      const data = {
+        ...teamData,
+        students: students
+      } as any;
 
       setTeam(data);
     } catch (error) {
@@ -111,7 +114,7 @@ export default function TeamDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading team information...</p>
@@ -122,8 +125,8 @@ export default function TeamDetailPage() {
 
   if (error || !team) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <div className="text-red-600 mb-4">
             <Users className="h-12 w-12 mx-auto" />
           </div>
@@ -133,7 +136,7 @@ export default function TeamDetailPage() {
           <p className="text-gray-600 mb-4">
             {error || "The requested team could not be found."}
           </p>
-          <Button onClick={handleBackClick} variant="outline">
+          <Button onClick={handleBackClick} variant="outline" className="border-gray-300 hover:bg-gray-50">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Admin
           </Button>
@@ -143,13 +146,13 @@ export default function TeamDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button onClick={handleBackClick} variant="outline" size="sm">
+              <Button onClick={handleBackClick} variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Admin
               </Button>
@@ -188,7 +191,7 @@ export default function TeamDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="h-5 w-5 mr-2" />
@@ -238,7 +241,7 @@ export default function TeamDetailPage() {
             </Card>
 
             {/* FIRST Program Information */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Award className="h-5 w-5 mr-2" />
@@ -306,7 +309,7 @@ export default function TeamDetailPage() {
 
             {/* Matched Students */}
             {team.students && team.students.length > 0 && (
-              <Card>
+              <Card className="border border-gray-100 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
@@ -338,6 +341,7 @@ export default function TeamDetailPage() {
                           onClick={() =>
                             router.push(`/admin/student/${student.id}`)
                           }
+                          className="border-gray-300 hover:bg-gray-50"
                         >
                           View Profile
                         </Button>
@@ -352,14 +356,14 @@ export default function TeamDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Actions */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   onClick={handleEmailClick}
-                  className="w-full"
+                  className="w-full border-gray-300 hover:bg-gray-50"
                   variant="outline"
                 >
                   <MailIcon className="h-4 w-4 mr-2" />
@@ -369,7 +373,7 @@ export default function TeamDetailPage() {
             </Card>
 
             {/* Team Information */}
-            <Card>
+            <Card className="border border-gray-100 shadow-sm">
               <CardHeader>
                 <CardTitle>Team Information</CardTitle>
               </CardHeader>
