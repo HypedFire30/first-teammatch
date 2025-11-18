@@ -148,59 +148,14 @@ function getStorageInstance(): FirebaseStorage {
   return {} as FirebaseStorage
 }
 
-// Export db and storage - they initialize on first access in browser
-// We need to use a getter pattern, but since they're passed as arguments,
-// we'll create wrapper objects that return the real instance
-export const db = new Proxy({} as Firestore, {
-  get(_target, prop) {
-    const instance = getDbInstance()
-    const value = (instance as any)[prop]
-    if (typeof value === 'function') {
-      return value.bind(instance)
-    }
-    return value
-  },
-  // Critical: when db is used as a value (passed to doc()), return the actual instance
-  // We do this by making the Proxy itself behave like the instance
-  getPrototypeOf() {
-    try {
-      return Object.getPrototypeOf(getDbInstance())
-    } catch {
-      return Object.getPrototypeOf({})
-    }
-  }
-}) as any as Firestore
+// Export db and storage as the actual instances
+// They must be real instances (not Proxies) because they're passed as arguments to Firebase functions
+// Initialize immediately in browser if configured
+export const db = (typeof window !== 'undefined' && isFirebaseConfigured() && dbInstance) 
+  ? dbInstance 
+  : ({} as Firestore)
 
-// Override valueOf to return the actual instance when db is used as a value
-Object.defineProperty(db, 'valueOf', {
-  value: () => getDbInstance(),
-  writable: false,
-  enumerable: false,
-  configurable: false
-})
-
-export const storage = new Proxy({} as FirebaseStorage, {
-  get(_target, prop) {
-    const instance = getStorageInstance()
-    const value = (instance as any)[prop]
-    if (typeof value === 'function') {
-      return value.bind(instance)
-    }
-    return value
-  },
-  getPrototypeOf() {
-    try {
-      return Object.getPrototypeOf(getStorageInstance())
-    } catch {
-      return Object.getPrototypeOf({})
-    }
-  }
-}) as any as FirebaseStorage
-
-Object.defineProperty(storage, 'valueOf', {
-  value: () => getStorageInstance(),
-  writable: false,
-  enumerable: false,
-  configurable: false
-})
+export const storage = (typeof window !== 'undefined' && isFirebaseConfigured() && storageInstance)
+  ? storageInstance
+  : ({} as FirebaseStorage)
 
