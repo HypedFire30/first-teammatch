@@ -5,18 +5,21 @@ A modern platform for matching students with FIRST Robotics teams, featuring a s
 ## 🚀 Features
 
 ### Student Registration
+
 - Multi-step form with progress tracking
 - Profile creation with skills, interests, and availability
 - Optional resume upload (PDF, DOC, DOCX up to 10MB)
 - Secure authentication and data storage
 
 ### Team Registration
+
 - Comprehensive team profile setup
 - Areas of need and student requirements
 - Grade range and time commitment preferences
 - Team achievements and qualities selection
 
 ### Admin Dashboard
+
 - View and manage student registrations
 - View and manage team registrations
 - User profile management
@@ -25,7 +28,9 @@ A modern platform for matching students with FIRST Robotics teams, featuring a s
 
 ### 1. Environment Variables
 
-Create a `.env.local` file with Firebase configuration:
+#### Local Development
+
+Create a `.env.local` file in the project root with Firebase configuration:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
@@ -35,6 +40,24 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 ```
+
+#### Vercel Deployment
+
+For Vercel deployments, set environment variables in the Vercel dashboard:
+
+1. Go to your project in [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to **Settings** → **Environment Variables**
+3. Add each of the following variables:
+   - `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+   - `NEXT_PUBLIC_FIREBASE_APP_ID`
+4. Set them for **Production**, **Preview**, and **Development** environments
+5. Redeploy your application after adding the variables
+
+**Note**: `.env.local` is only for local development. Vercel uses environment variables set in the dashboard.
 
 ### 2. Firebase Setup
 
