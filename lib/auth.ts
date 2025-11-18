@@ -296,47 +296,78 @@ export async function getUserProfile(userId: string): Promise<{ profile: UserPro
       throw new Error('User ID is required')
     }
 
+    console.log('getUserProfile: Checking profile for userId:', userId)
+
     // Check if user exists in admins collection
-    const adminDoc = await getDoc(doc(db, 'admins', userId));
-    if (adminDoc.exists()) {
-      return {
-        profile: {
-          type: 'admin',
-          profile: { id: adminDoc.id, ...adminDoc.data() }
-        },
-        error: null
+    try {
+      const adminDoc = await getDoc(doc(db, 'admins', userId));
+      if (adminDoc.exists()) {
+        console.log('getUserProfile: Found admin profile')
+        return {
+          profile: {
+            type: 'admin',
+            profile: { id: adminDoc.id, ...adminDoc.data() }
+          },
+          error: null
+        }
       }
+    } catch (adminError: any) {
+      console.error('getUserProfile: Error checking admins:', adminError)
+      // Continue to check other collections
     }
 
     // Check if user exists in students collection
-    const studentDoc = await getDoc(doc(db, 'students', userId));
-    if (studentDoc.exists()) {
-      return {
-        profile: {
-          type: 'student',
-          profile: { id: studentDoc.id, ...studentDoc.data() }
-        },
-        error: null
+    try {
+      const studentDoc = await getDoc(doc(db, 'students', userId));
+      if (studentDoc.exists()) {
+        console.log('getUserProfile: Found student profile')
+        return {
+          profile: {
+            type: 'student',
+            profile: { id: studentDoc.id, ...studentDoc.data() }
+          },
+          error: null
+        }
       }
+    } catch (studentError: any) {
+      console.error('getUserProfile: Error checking students:', studentError)
+      // Continue to check other collections
     }
 
     // Check if user exists in teams collection
-    const teamDoc = await getDoc(doc(db, 'teams', userId));
-    if (teamDoc.exists()) {
-      return {
-        profile: {
-          type: 'team',
-          profile: { id: teamDoc.id, ...teamDoc.data() }
-        },
-        error: null
+    try {
+      const teamDoc = await getDoc(doc(db, 'teams', userId));
+      if (teamDoc.exists()) {
+        console.log('getUserProfile: Found team profile')
+        return {
+          profile: {
+            type: 'team',
+            profile: { id: teamDoc.id, ...teamDoc.data() }
+          },
+          error: null
+        }
       }
+    } catch (teamError: any) {
+      console.error('getUserProfile: Error checking teams:', teamError)
     }
 
-    // If neither found, return null
-    return { profile: null, error: { message: 'Profile not found' } }
+    // If neither found, return error with more context
+    console.warn('getUserProfile: No profile found for userId:', userId)
+    return { profile: null, error: { message: 'Profile not found. Please complete your registration.' } }
   } catch (error: any) {
     console.error('getUserProfile error:', error)
-    return { profile: null, error: { message: error.message } }
+    console.error('Error code:', error.code)
+    console.error('Error message:', error.message)
+    
+    // Provide more helpful error messages
+    let errorMessage = error.message
+    if (error.code === 'permission-denied') {
+      errorMessage = 'Permission denied. Please check Firestore security rules.'
+    } else if (error.code === 'unavailable') {
+      errorMessage = 'Firestore is temporarily unavailable. Please try again.'
+    }
+    
+    return { profile: null, error: { message: errorMessage } }
   }
 }
 
