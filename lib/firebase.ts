@@ -113,6 +113,44 @@ export const auth = new Proxy({} as Auth, {
   }
 })
 
+// Initialize Firebase immediately in browser (not during build)
+if (typeof window !== 'undefined' && isFirebaseConfigured()) {
+  initializeFirebase()
+}
+
+// Helper to get db instance, initializing if needed
+function getDbInstance(): Firestore {
+  if (typeof window !== 'undefined') {
+    if (!dbInstance) {
+      initializeFirebase()
+    }
+    if (!dbInstance) {
+      throw new Error('Firestore is not initialized. Please check Firebase environment variables.')
+    }
+    return dbInstance
+  }
+  // During build, return empty object
+  return {} as Firestore
+}
+
+// Helper to get storage instance
+function getStorageInstance(): FirebaseStorage {
+  if (typeof window !== 'undefined') {
+    if (!storageInstance) {
+      initializeFirebase()
+    }
+    if (!storageInstance) {
+      throw new Error('Firebase Storage is not initialized. Please check Firebase environment variables.')
+    }
+    return storageInstance
+  }
+  // During build, return empty object
+  return {} as FirebaseStorage
+}
+
+// Export db and storage - they initialize on first access in browser
+// We need to use a getter pattern, but since they're passed as arguments,
+// we'll create wrapper objects that return the real instance
 export const db = new Proxy({} as Firestore, {
   get(_target, prop) {
     const instance = getDbInstance()
@@ -121,7 +159,24 @@ export const db = new Proxy({} as Firestore, {
       return value.bind(instance)
     }
     return value
+  },
+  // Critical: when db is used as a value (passed to doc()), return the actual instance
+  // We do this by making the Proxy itself behave like the instance
+  getPrototypeOf() {
+    try {
+      return Object.getPrototypeOf(getDbInstance())
+    } catch {
+      return Object.getPrototypeOf({})
+    }
   }
+}) as any as Firestore
+
+// Override valueOf to return the actual instance when db is used as a value
+Object.defineProperty(db, 'valueOf', {
+  value: () => getDbInstance(),
+  writable: false,
+  enumerable: false,
+  configurable: false
 })
 
 export const storage = new Proxy({} as FirebaseStorage, {
@@ -132,6 +187,20 @@ export const storage = new Proxy({} as FirebaseStorage, {
       return value.bind(instance)
     }
     return value
+  },
+  getPrototypeOf() {
+    try {
+      return Object.getPrototypeOf(getStorageInstance())
+    } catch {
+      return Object.getPrototypeOf({})
+    }
   }
+}) as any as FirebaseStorage
+
+Object.defineProperty(storage, 'valueOf', {
+  value: () => getStorageInstance(),
+  writable: false,
+  enumerable: false,
+  configurable: false
 })
 
