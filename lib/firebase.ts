@@ -75,32 +75,6 @@ function getAuthInstance(): Auth {
   return createMockAuth()
 }
 
-function getDbInstance(): Firestore {
-  if (typeof window !== 'undefined') {
-    initializeFirebase()
-    if (!dbInstance) {
-      // Return mock instead of throwing - allows app to work without Firebase
-      return {} as Firestore
-    }
-    return dbInstance
-  }
-  // During build, return a mock object
-  return {} as Firestore
-}
-
-function getStorageInstance(): FirebaseStorage {
-  if (typeof window !== 'undefined') {
-    initializeFirebase()
-    if (!storageInstance) {
-      // Return mock instead of throwing - allows app to work without Firebase
-      return {} as FirebaseStorage
-    }
-    return storageInstance
-  }
-  // During build, return a mock object
-  return {} as FirebaseStorage
-}
-
 // Export services using Proxy to make them lazy
 export const auth = new Proxy({} as Auth, {
   get(_target, prop) {
