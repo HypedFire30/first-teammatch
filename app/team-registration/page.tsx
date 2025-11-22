@@ -29,7 +29,7 @@ const teamRegistrationSchema = z.object({
     .regex(/\d/, "Password must contain at least one number"),
   firstLevel: z.string(),
   zipCode: z.string(),
-  isSchoolTeam: z.boolean().default(false),
+  isSchoolTeam: z.boolean().nullable().optional(),
   schoolName: z.string().optional(),
   areasOfNeed: z.array(z.string()),
   gradeRangeMin: z.number(),
@@ -74,6 +74,7 @@ export default function TeamRegistrationPage() {
   const [timeCommitment, setTimeCommitment] = useState([10]);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepErrors, setStepErrors] = useState<{ [key: number]: string }>({});
+  const [isExplicitSubmit, setIsExplicitSubmit] = useState(false);
 
   const {
     register,
@@ -83,6 +84,7 @@ export default function TeamRegistrationPage() {
     formState: { errors, isSubmitting },
   } = useForm<TeamRegistrationForm>({
     resolver: zodResolver(teamRegistrationSchema),
+    mode: "onSubmit", // Only validate on submit, not on change
     defaultValues: {
       firstLevel: "",
       zipCode: "",
@@ -91,7 +93,6 @@ export default function TeamRegistrationPage() {
       timeCommitment: 10,
       areasOfNeed: [],
       qualities: [],
-      isSchoolTeam: false,
     },
   });
 
@@ -256,11 +257,19 @@ export default function TeamRegistrationPage() {
     if (!validateStep(currentStep)) {
       return;
     }
+
+    const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+
+    // Prevent going beyond the last step
+    if (currentStep >= maxStep) {
+      return;
+    }
+
     // Skip school name step if not a school team
-    if (currentStep === 5 && !watch("isSchoolTeam")) {
+    if (currentStep === 5 && watch("isSchoolTeam") !== true) {
       setCurrentStep(7);
     } else {
-      setCurrentStep((prev) => Math.min(prev + 1, 12));
+      setCurrentStep((prev) => Math.min(prev + 1, maxStep));
     }
   };
 
@@ -343,7 +352,24 @@ export default function TeamRegistrationPage() {
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <div className="w-full max-w-3xl px-6 sm:px-8 lg:px-12">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form
+          onSubmit={(e) => {
+            // Only allow submission when explicitly clicking the submit button on the last step
+            const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+            if (!isExplicitSubmit || currentStep < maxStep) {
+              e.preventDefault();
+              return;
+            }
+            handleSubmit(onSubmit)(e);
+          }}
+          onKeyDown={(e) => {
+            // Prevent form submission on Enter key when on last step
+            const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+            if (e.key === "Enter" && currentStep >= maxStep) {
+              e.preventDefault();
+            }
+          }}
+        >
           <div className="relative">
             {/* Progress indicator */}
             <div className="mb-8">
@@ -482,7 +508,7 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       Is this a school team?
                     </h2>
-                    <div 
+                    <div
                       className="space-y-3"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -496,7 +522,12 @@ export default function TeamRegistrationPage() {
                         <Checkbox
                           checked={watch("isSchoolTeam") === true}
                           onCheckedChange={(checked) => {
-                            if (checked) handleSchoolTeamToggle(true);
+                            if (checked) {
+                              handleSchoolTeamToggle(true);
+                            } else {
+                              // Uncheck by setting to false
+                              setValue("isSchoolTeam", false);
+                            }
                           }}
                         />
                         <span className="text-lg">Yes, it's a school team</span>
@@ -505,7 +536,9 @@ export default function TeamRegistrationPage() {
                         <Checkbox
                           checked={watch("isSchoolTeam") === false}
                           onCheckedChange={(checked) => {
-                            if (checked) handleSchoolTeamToggle(false);
+                            if (checked) {
+                              handleSchoolTeamToggle(false);
+                            }
                           }}
                         />
                         <span className="text-lg">
@@ -541,7 +574,7 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       What areas do you need help with?
                     </h2>
-                    <div 
+                    <div
                       className="space-y-3"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && selectedAreas.length > 0) {
@@ -587,7 +620,11 @@ export default function TeamRegistrationPage() {
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
-                              document.querySelector<HTMLInputElement>('input[placeholder="Max"]')?.focus();
+                              document
+                                .querySelector<HTMLInputElement>(
+                                  'input[placeholder="Max"]'
+                                )
+                                ?.focus();
                             }
                           }}
                         />
@@ -619,7 +656,7 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       How many hours per week do you expect from students?
                     </h2>
-                    <div 
+                    <div
                       className="space-y-4"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -674,16 +711,7 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       What qualities are you looking for? (Select up to 3)
                     </h2>
-                    <div 
-                      className="space-y-3"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && selectedQualities.length > 0) {
-                          e.preventDefault();
-                          nextStep();
-                        }
-                      }}
-                      tabIndex={0}
-                    >
+                    <div className="space-y-3">
                       {qualities.map((quality) => {
                         const isDisabled =
                           !selectedQualities.includes(quality.value) &&
@@ -692,11 +720,15 @@ export default function TeamRegistrationPage() {
                           <label
                             key={quality.value}
                             className={`flex items-center space-x-3 ${
-                              isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                              isDisabled
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer"
                             }`}
                           >
                             <Checkbox
-                              checked={selectedQualities.includes(quality.value)}
+                              checked={selectedQualities.includes(
+                                quality.value
+                              )}
                               onCheckedChange={() => {
                                 if (!isDisabled) {
                                   handleQualityToggle(quality.value);
@@ -734,7 +766,7 @@ export default function TeamRegistrationPage() {
                 ← Back
               </button>
 
-              {currentStep < (watch("isSchoolTeam") ? 12 : 11) ? (
+              {currentStep < (watch("isSchoolTeam") === true ? 12 : 11) ? (
                 <button
                   type="button"
                   onClick={nextStep}
@@ -746,6 +778,17 @@ export default function TeamRegistrationPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
+                  onClick={(e) => {
+                    // Mark that this is an explicit submit button click
+                    setIsExplicitSubmit(true);
+                    // Ensure we're on the last step before allowing submission
+                    const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+                    if (currentStep < maxStep) {
+                      e.preventDefault();
+                      setIsExplicitSubmit(false);
+                      return;
+                    }
+                  }}
                   className="text-lg text-red-600 hover:text-red-700 font-semibold disabled:opacity-50 transition-colors"
                 >
                   {isSubmitting ? "Submitting..." : "Submit →"}

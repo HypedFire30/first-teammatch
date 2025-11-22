@@ -346,7 +346,15 @@ export default function StudentRegistrationPage() {
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <div className="w-full max-w-3xl px-6 sm:px-8 lg:px-12">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form 
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={(e) => {
+            // Prevent form submission on Enter key when on last step
+            if (e.key === "Enter" && currentStep >= 11) {
+              e.preventDefault();
+            }
+          }}
+        >
           <div className="relative">
             {/* Progress indicator */}
             <div className="mb-8">
@@ -562,7 +570,15 @@ export default function StudentRegistrationPage() {
                 )}
 
                 {currentStep === 9 && (
-                  <div>
+                  <div
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                    tabIndex={0}
+                  >
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx"
@@ -602,12 +618,6 @@ export default function StudentRegistrationPage() {
                     className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors resize-none"
                     rows={4}
                     autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                        e.preventDefault();
-                        nextStep();
-                      }
-                    }}
                   />
                 )}
 
