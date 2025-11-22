@@ -10,6 +10,7 @@ interface PasswordInputProps {
   placeholder?: string;
   className?: string;
   error?: string;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 interface PasswordRequirement {
@@ -42,6 +43,7 @@ export function PasswordInput({
   placeholder = "Password",
   className,
   error,
+  onKeyDown,
 }: PasswordInputProps) {
   const [showRequirements, setShowRequirements] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -64,6 +66,7 @@ export function PasswordInput({
           setShowRequirements(true);
         }}
         onBlur={() => setFocused(false)}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         className={className}
         aria-describedby={

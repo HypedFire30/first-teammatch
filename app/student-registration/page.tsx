@@ -428,6 +428,12 @@ export default function StudentRegistrationPage() {
                     placeholder="Enter password"
                     className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors"
                     error={stepErrors[2] || errors.password?.message}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
                   />
                 )}
 
@@ -468,7 +474,16 @@ export default function StudentRegistrationPage() {
                 )}
 
                 {currentStep === 5 && (
-                  <div className="space-y-3">
+                  <div 
+                    className="space-y-3"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && selectedAreas.length > 0) {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                    tabIndex={0}
+                  >
                     {areasOfInterest.map((area) => (
                       <label
                         key={area.value}
@@ -518,7 +533,16 @@ export default function StudentRegistrationPage() {
                 )}
 
                 {currentStep === 8 && (
-                  <div className="space-y-4">
+                  <div 
+                    className="space-y-4"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
+                    tabIndex={0}
+                  >
                     <div className="text-3xl font-light text-gray-900">
                       {timeCommitment[0]} hours/week
                     </div>
@@ -562,6 +586,12 @@ export default function StudentRegistrationPage() {
                     className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors resize-none"
                     rows={4}
                     autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
                   />
                 )}
 
@@ -572,6 +602,12 @@ export default function StudentRegistrationPage() {
                     className="w-full text-lg border border-gray-200 rounded-lg focus:border-blue-600 px-5 py-4 focus:ring-2 focus:ring-blue-600 transition-colors resize-none"
                     rows={4}
                     autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        nextStep();
+                      }
+                    }}
                   />
                 )}
 

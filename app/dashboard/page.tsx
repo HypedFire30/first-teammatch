@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getSession,
-  getUserProfile,
-  getUserMatches,
-} from "@/lib/auth";
+import { getSession, getUserProfile, getUserMatches } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -81,7 +77,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading your dashboard...</p>
@@ -92,10 +88,10 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <p className="text-red-600 mb-4">Error: {error}</p>
-          <Button 
+          <Button
             onClick={() => router.push("/login")}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
@@ -108,10 +104,10 @@ export default function DashboardPage() {
 
   if (!userProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center max-w-md">
           <p className="text-gray-600 mb-4">User profile not found</p>
-          <Button 
+          <Button
             onClick={() => router.push("/login")}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
@@ -128,7 +124,7 @@ export default function DashboardPage() {
   const isAdmin = type === "admin";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}

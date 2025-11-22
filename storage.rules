@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Student resumes
+    match /student-resumes/{fileName} {
+      // Users can upload their own resumes
+      allow write: if request.auth != null && 
+        request.resource.size < 10 * 1024 * 1024; // 10MB limit
+      
+      // Users can read their own resumes
+      // Admins can read all resumes
+      allow read: if request.auth != null && (
+        // Allow if user is admin
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid)) ||
+        // Allow if user is authenticated (for now, all authenticated users can read)
+        // You can restrict this further if needed
+        true
+      );
+    }
+    
+    // Deny all other access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

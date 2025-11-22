@@ -437,7 +437,7 @@ export default function AdminPage() {
   // Show login screen if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-white">
         <div className="max-w-md mx-auto mt-20 space-y-8 p-8">
           <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 text-center">
             <div className="mx-auto h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -644,7 +644,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
         {/* Stats Bar */}
         <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8">

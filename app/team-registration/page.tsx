@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -84,19 +84,16 @@ export default function TeamRegistrationPage() {
   } = useForm<TeamRegistrationForm>({
     resolver: zodResolver(teamRegistrationSchema),
     defaultValues: {
+      firstLevel: "",
+      zipCode: "",
       gradeRangeMin: 6,
       gradeRangeMax: 12,
       timeCommitment: 10,
       areasOfNeed: [],
       qualities: [],
+      isSchoolTeam: false,
     },
   });
-
-  useEffect(() => {
-    setValue("timeCommitment", 10);
-    setValue("areasOfNeed", []);
-    setValue("qualities", []);
-  }, [setValue]);
 
   const handleAreaToggle = (area: string) => {
     const newSelectedAreas = selectedAreas.includes(area)
@@ -424,6 +421,12 @@ export default function TeamRegistrationPage() {
                       placeholder="Enter password"
                       className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
                       error={stepErrors[2] || errors.password?.message}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
                     />
                   </>
                 )}
@@ -434,7 +437,7 @@ export default function TeamRegistrationPage() {
                       What FIRST level is your team?
                     </h2>
                     <Select
-                      value={watch("firstLevel")}
+                      value={watch("firstLevel") || ""}
                       onValueChange={(value) => {
                         setValue("firstLevel", value as any);
                         setTimeout(() => nextStep(), 300);
@@ -479,29 +482,36 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       Is this a school team?
                     </h2>
-                    <div className="space-y-3">
-                      <div
-                        className="flex items-center space-x-3 cursor-pointer"
-                        onClick={() => handleSchoolTeamToggle(true)}
-                      >
+                    <div 
+                      className="space-y-3"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
+                      tabIndex={0}
+                    >
+                      <label className="flex items-center space-x-3 cursor-pointer">
                         <Checkbox
                           checked={watch("isSchoolTeam") === true}
-                          onCheckedChange={() => handleSchoolTeamToggle(true)}
+                          onCheckedChange={(checked) => {
+                            if (checked) handleSchoolTeamToggle(true);
+                          }}
                         />
                         <span className="text-lg">Yes, it's a school team</span>
-                      </div>
-                      <div
-                        className="flex items-center space-x-3 cursor-pointer"
-                        onClick={() => handleSchoolTeamToggle(false)}
-                      >
+                      </label>
+                      <label className="flex items-center space-x-3 cursor-pointer">
                         <Checkbox
                           checked={watch("isSchoolTeam") === false}
-                          onCheckedChange={() => handleSchoolTeamToggle(false)}
+                          onCheckedChange={(checked) => {
+                            if (checked) handleSchoolTeamToggle(false);
+                          }}
                         />
                         <span className="text-lg">
                           No, it's a community team
                         </span>
-                      </div>
+                      </label>
                     </div>
                   </>
                 )}
@@ -531,19 +541,27 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       What areas do you need help with?
                     </h2>
-                    <div className="space-y-3">
+                    <div 
+                      className="space-y-3"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && selectedAreas.length > 0) {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
+                      tabIndex={0}
+                    >
                       {areasOfNeed.map((area) => (
-                        <div
+                        <label
                           key={area.value}
                           className="flex items-center space-x-3 cursor-pointer"
-                          onClick={() => handleAreaToggle(area.value)}
                         >
                           <Checkbox
                             checked={selectedAreas.includes(area.value)}
                             onCheckedChange={() => handleAreaToggle(area.value)}
                           />
                           <span className="text-lg">{area.label}</span>
-                        </div>
+                        </label>
                       ))}
                     </div>
                   </>
@@ -566,6 +584,12 @@ export default function TeamRegistrationPage() {
                           max="12"
                           className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
                           autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              document.querySelector<HTMLInputElement>('input[placeholder="Max"]')?.focus();
+                            }
+                          }}
                         />
                       </div>
                       <div>
@@ -578,6 +602,12 @@ export default function TeamRegistrationPage() {
                           min="1"
                           max="12"
                           className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              nextStep();
+                            }
+                          }}
                         />
                       </div>
                     </div>
@@ -589,7 +619,16 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       How many hours per week do you expect from students?
                     </h2>
-                    <div className="space-y-4">
+                    <div 
+                      className="space-y-4"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
+                      tabIndex={0}
+                    >
                       <div className="text-3xl font-light text-gray-900">
                         {timeCommitment[0]} hours/week
                       </div>
@@ -620,6 +659,12 @@ export default function TeamRegistrationPage() {
                       className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors resize-none"
                       rows={4}
                       autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
                     />
                   </>
                 )}
@@ -629,40 +674,40 @@ export default function TeamRegistrationPage() {
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                       What qualities are you looking for? (Select up to 3)
                     </h2>
-                    <div className="space-y-3">
-                      {qualities.map((quality) => (
-                        <div
-                          key={quality.value}
-                          className={`flex items-center space-x-3 cursor-pointer ${
-                            selectedQualities.length >= 3 &&
-                            !selectedQualities.includes(quality.value)
-                              ? "opacity-50"
-                              : ""
-                          }`}
-                          onClick={() => {
-                            if (
-                              !(
-                                selectedQualities.length >= 3 &&
-                                !selectedQualities.includes(quality.value)
-                              )
-                            ) {
-                              handleQualityToggle(quality.value);
-                            }
-                          }}
-                        >
-                          <Checkbox
-                            checked={selectedQualities.includes(quality.value)}
-                            onCheckedChange={() =>
-                              handleQualityToggle(quality.value)
-                            }
-                            disabled={
-                              !selectedQualities.includes(quality.value) &&
-                              selectedQualities.length >= 3
-                            }
-                          />
-                          <span className="text-lg">{quality.label}</span>
-                        </div>
-                      ))}
+                    <div 
+                      className="space-y-3"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && selectedQualities.length > 0) {
+                          e.preventDefault();
+                          nextStep();
+                        }
+                      }}
+                      tabIndex={0}
+                    >
+                      {qualities.map((quality) => {
+                        const isDisabled =
+                          !selectedQualities.includes(quality.value) &&
+                          selectedQualities.length >= 3;
+                        return (
+                          <label
+                            key={quality.value}
+                            className={`flex items-center space-x-3 ${
+                              isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={selectedQualities.includes(quality.value)}
+                              onCheckedChange={() => {
+                                if (!isDisabled) {
+                                  handleQualityToggle(quality.value);
+                                }
+                              }}
+                              disabled={isDisabled}
+                            />
+                            <span className="text-lg">{quality.label}</span>
+                          </label>
+                        );
+                      })}
                       <p className="text-sm text-gray-400 mt-4">
                         Selected: {selectedQualities.length}/3
                       </p>

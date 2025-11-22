@@ -1,4 +1,4 @@
-import { 
+import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
@@ -9,7 +9,7 @@ import {
   sendPasswordResetEmail,
   getAuth
 } from 'firebase/auth'
-import { 
+import {
   collection,
   doc,
   getDoc,
@@ -21,7 +21,7 @@ import {
   updateDoc,
   Timestamp
 } from 'firebase/firestore'
-import { 
+import {
   ref,
   uploadBytes,
   getDownloadURL,
@@ -50,7 +50,7 @@ export async function signUp(email: string, password: string, userData: any, use
   if (!isFirebaseConfigured()) {
     return { user: null, error: { message: 'Firebase is not configured. Please set Firebase environment variables in .env.local' } }
   }
-  
+
   try {
     console.log("signUp called with:", { email, userType, userData });
 
@@ -90,6 +90,8 @@ export async function signUp(email: string, password: string, userData: any, use
       } catch (uploadError: any) {
         console.error("Resume upload failed:", uploadError);
         // Continue without the resume if upload fails
+      } finally {
+        // Always remove the File object from processedUserData before saving to Firestore
         delete processedUserData.resume_file;
       }
     }
@@ -113,17 +115,17 @@ export async function signUp(email: string, password: string, userData: any, use
     return { user, error: null }
   } catch (error: any) {
     console.error("signUp error:", error);
-    
+
     // Handle rate limiting specifically
     if (error.code === 'auth/too-many-requests') {
-      return { 
-        user: null, 
-        error: { 
-          message: 'Too many requests. Please wait a few minutes before trying again. Firebase has rate limits to prevent abuse.' 
-        } 
+      return {
+        user: null,
+        error: {
+          message: 'Too many requests. Please wait a few minutes before trying again. Firebase has rate limits to prevent abuse.'
+        }
       }
     }
-    
+
     // Handle other common errors
     let errorMessage = error.message;
     if (error.code === 'auth/email-already-in-use') {
@@ -133,7 +135,7 @@ export async function signUp(email: string, password: string, userData: any, use
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Invalid email address. Please check your email and try again.';
     }
-    
+
     return { user: null, error: { message: errorMessage } }
   }
 }
@@ -143,21 +145,21 @@ export async function signIn(email: string, password: string) {
   if (!isFirebaseConfigured()) {
     return { user: null, error: { message: 'Firebase is not configured. Please set Firebase environment variables in .env.local' } }
   }
-  
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { user: userCredential.user, error: null }
   } catch (error: any) {
     // Handle rate limiting specifically
     if (error.code === 'auth/too-many-requests') {
-      return { 
-        user: null, 
-        error: { 
-          message: 'Too many sign-in attempts. Please wait a few minutes before trying again.' 
-        } 
+      return {
+        user: null,
+        error: {
+          message: 'Too many sign-in attempts. Please wait a few minutes before trying again.'
+        }
       }
     }
-    
+
     // Handle other common errors
     let errorMessage = error.message;
     if (error.code === 'auth/user-not-found') {
@@ -169,7 +171,7 @@ export async function signIn(email: string, password: string) {
     } else if (error.code === 'auth/user-disabled') {
       errorMessage = 'This account has been disabled. Please contact support.';
     }
-    
+
     return { user: null, error: { message: errorMessage } }
   }
 }
@@ -196,13 +198,13 @@ export async function resendConfirmationEmail(email: string) {
   } catch (error: any) {
     // Handle rate limiting specifically
     if (error.code === 'auth/too-many-requests') {
-      return { 
-        error: { 
-          message: 'Too many verification email requests. Please wait a few minutes before requesting another email.' 
-        } 
+      return {
+        error: {
+          message: 'Too many verification email requests. Please wait a few minutes before requesting another email.'
+        }
       }
     }
-    
+
     return { error: { message: error.message } }
   }
 }
@@ -212,12 +214,12 @@ export async function sendPasswordReset(email: string) {
   if (!isFirebaseConfigured()) {
     return { error: { message: 'Firebase is not configured' } }
   }
-  
+
   // Validate email format
   if (!email || !email.trim()) {
     return { error: { message: 'Please enter a valid email address' } }
   }
-  
+
   try {
     console.log('Sending password reset email to:', email);
     await sendPasswordResetEmail(auth, email);
@@ -227,16 +229,16 @@ export async function sendPasswordReset(email: string) {
     console.error('Password reset error:', error);
     console.error('Error code:', error.code);
     console.error('Error message:', error.message);
-    
+
     // Handle rate limiting specifically
     if (error.code === 'auth/too-many-requests') {
-      return { 
-        error: { 
-          message: 'Too many password reset requests. Please wait a few minutes before requesting another reset email.' 
-        } 
+      return {
+        error: {
+          message: 'Too many password reset requests. Please wait a few minutes before requesting another reset email.'
+        }
       }
     }
-    
+
     // Handle other common errors
     let errorMessage = error.message;
     if (error.code === 'auth/user-not-found') {
@@ -249,7 +251,7 @@ export async function sendPasswordReset(email: string) {
     } else if (error.code === 'auth/missing-email') {
       errorMessage = 'Email address is required.';
     }
-    
+
     return { error: { message: errorMessage } }
   }
 }
@@ -259,7 +261,7 @@ export async function getSession() {
   if (!isFirebaseConfigured()) {
     return { session: null, error: { message: 'Firebase is not configured' } }
   }
-  
+
   try {
     const user = auth.currentUser;
     if (user) {
@@ -276,7 +278,7 @@ export async function getCurrentUser() {
   if (!isFirebaseConfigured()) {
     return { user: null, error: { message: 'Firebase is not configured' } }
   }
-  
+
   try {
     const user = auth.currentUser;
     return { user, error: null }
@@ -290,7 +292,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: UserPro
   if (!isFirebaseConfigured()) {
     return { profile: null, error: { message: 'Firebase is not configured' } }
   }
-  
+
   try {
     if (!userId) {
       throw new Error('User ID is required')
@@ -358,7 +360,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: UserPro
     console.error('getUserProfile error:', error)
     console.error('Error code:', error.code)
     console.error('Error message:', error.message)
-    
+
     // Provide more helpful error messages
     let errorMessage = error.message
     if (error.code === 'permission-denied') {
@@ -366,7 +368,7 @@ export async function getUserProfile(userId: string): Promise<{ profile: UserPro
     } else if (error.code === 'unavailable') {
       errorMessage = 'Firestore is temporarily unavailable. Please try again.'
     }
-    
+
     return { profile: null, error: { message: errorMessage } }
   }
 }
@@ -389,7 +391,7 @@ export async function getUserMatches(userId: string): Promise<{ matches: any[] |
       }
 
       const studentData = { id: studentDoc.id, ...studentDoc.data() } as any;
-      
+
       if (studentData.is_matched && studentData.matched_team_id) {
         // Get the matched team
         const teamDoc = await getDoc(doc(db, 'teams', studentData.matched_team_id));
@@ -405,7 +407,7 @@ export async function getUserMatches(userId: string): Promise<{ matches: any[] |
           }
         }
       }
-      
+
       // Student is not matched - return empty array
       return { matches: [], error: null }
     } else if (profile.type === 'team') {
