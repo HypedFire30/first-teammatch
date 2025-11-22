@@ -486,7 +486,7 @@ export default function TeamRegistrationPage() {
                 {currentStep === 4 && (
                   <>
                     <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      Where is your team located?
+                      What's your zip code??
                     </h2>
                     <Input
                       {...register("zipCode")}
