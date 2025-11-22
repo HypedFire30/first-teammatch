@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getSession, getUserType, signOut } from "@/lib/auth";
+import { getSession, getUserType, signOut, getResumeUrl } from "@/lib/auth";
 import {
   collection,
   getDocs,
@@ -987,6 +987,29 @@ export default function AdminPage() {
                         <Mail className="h-4 w-4 mr-1" />
                         Email
                       </Button>
+                      {student.resume_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const resumeUrl = await getResumeUrl(student.resume_url);
+                              if (resumeUrl) {
+                                window.open(resumeUrl, "_blank");
+                              } else {
+                                alert("Failed to load resume. Please try again.");
+                              }
+                            } catch (error) {
+                              console.error("Error loading resume:", error);
+                              alert("Failed to load resume. Please try again.");
+                            }
+                          }}
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          View Resume
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"

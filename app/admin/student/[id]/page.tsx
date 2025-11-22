@@ -111,8 +111,17 @@ export default function StudentDetailPage() {
 
   const handleResumeClick = async () => {
     if (student?.resume_url) {
-      const resumeUrl = await getResumeUrl(student.resume_url);
-      window.open(resumeUrl, "_blank");
+      try {
+        const resumeUrl = await getResumeUrl(student.resume_url);
+        if (resumeUrl) {
+          window.open(resumeUrl, "_blank");
+        } else {
+          alert("Failed to load resume. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error loading resume:", error);
+        alert("Failed to load resume. Please try again.");
+      }
     } else {
       alert("No resume uploaded");
     }
