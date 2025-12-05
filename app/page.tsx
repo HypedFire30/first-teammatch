@@ -13,7 +13,10 @@ import {
   Star,
   Building2,
   Bot,
+  Code,
 } from "lucide-react";
+import { appConfig } from "@/lib/config";
+import Link from "next/link";
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,7 +24,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative border-b border-gray-100">
+      <section className="relative">
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-8 sm:pt-20 sm:pb-10">
           <div className="text-center max-w-4xl mx-auto">
             {/* Logo/Brand */}
@@ -30,13 +33,10 @@ export default function HomePage() {
                 <Bot className="h-8 w-8 text-white" />
               </div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 tracking-tight">
-                <span className="animate-drift-gradient">
-                  FIRST TeamMatch
-                </span>
+                <span className="animate-drift-gradient">FIRST TeamMatch</span>
               </h1>
               <p className="text-xl sm:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light">
-                Connecting passionate students with competitive FIRST robotics teams.
-                Built by 12808 RevAmped to strengthen the FIRST community.
+                {appConfig.appDescription}
               </p>
             </div>
 
@@ -68,14 +68,15 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-8 sm:py-10 border-b border-gray-100">
+      <section className="py-8 sm:py-10">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               How It Works
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Three simple steps to connect students and FIRST robotics teams together.
+              Three simple steps to connect students and FIRST robotics teams
+              together.
             </p>
           </div>
 
@@ -93,7 +94,8 @@ export default function HomePage() {
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
                   Students and teams create detailed profiles highlighting their
-                  skills, interests, and requirements. Tell us what makes you unique.
+                  skills, interests, and requirements. Tell us what makes you
+                  unique.
                 </p>
               </div>
             </div>
@@ -111,7 +113,8 @@ export default function HomePage() {
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
                   Our smart algorithm analyzes compatibility based on skills,
-                  location, time commitment, and team needs to find your perfect match.
+                  location, time commitment, and team needs to find your perfect
+                  match.
                 </p>
               </div>
             </div>
@@ -138,14 +141,15 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-8 sm:py-10 border-b border-gray-100">
+      <section className="py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Why Choose FIRST TeamMatch?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're building the future of FIRST robotics by connecting talent with opportunity.
+              We're building the future of FIRST robotics by connecting talent
+              with opportunity.
             </p>
           </div>
 
@@ -171,7 +175,7 @@ export default function HomePage() {
                 Community Built
               </h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Created by RevAmped #12808, a team that understands what makes
+                Created by FTC12808 RevAmped, a team that understands what makes
                 FIRST special.
               </p>
             </div>
@@ -215,13 +219,13 @@ export default function HomePage() {
                 About RevAmped
               </h3>
               <p className="text-base text-gray-600 leading-relaxed mb-4">
-                RevAmped #12808 is a competitive FIRST Tech Challenge team based
-                in Portland, Oregon. We're passionate about robotics,
+                {appConfig.organizationName} is a competitive FIRST Tech Challenge team
+                based in {appConfig.organizationLocation}. We're passionate about robotics,
                 innovation, and building a stronger FIRST community.
               </p>
               <div className="flex items-center text-base text-gray-600">
                 <MapPin className="h-4 w-4 mr-2" />
-                <span>Portland, Oregon</span>
+                <span>{appConfig.organizationLocation}</span>
               </div>
             </div>
 
@@ -231,7 +235,8 @@ export default function HomePage() {
                 Contact Us
               </h3>
               <p className="text-base text-gray-600 mb-6">
-                Have questions or want to learn more? We'd love to hear from you.
+                Have questions or want to learn more? We'd love to hear from
+                you.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
@@ -239,7 +244,7 @@ export default function HomePage() {
                   variant="outline"
                   className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
                 >
-                  <a href="mailto:revampedrobotics@gmail.com">
+                  <a href={`mailto:${appConfig.organizationEmail}`}>
                     <Mail className="h-4 w-4 mr-2" />
                     Email
                   </a>
@@ -251,7 +256,7 @@ export default function HomePage() {
                   className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <a
-                    href="https://revampedrobotics.org"
+                    href={appConfig.organizationWebsite}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -259,13 +264,24 @@ export default function HomePage() {
                     Website
                   </a>
                 </Button>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <Link href="/setup">
+                    <Code className="h-4 w-4 mr-2" />
+                    Setup Guide
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
 
           <div className="border-t border-gray-200 pt-6 text-center">
             <p className="text-sm text-gray-500">
-              © 2025 FIRST TeamMatch. Built by RevAmped #12808
+              © 2025 {appConfig.appName}. Built by {appConfig.organizationName}.
             </p>
           </div>
         </div>

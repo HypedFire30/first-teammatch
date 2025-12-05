@@ -1,6 +1,34 @@
 # Firebase Environment Variables
 # Copy these to your .env.local file
 
+# ============================================
+# APPLICATION CONFIGURATION
+# ============================================
+# Customize these values for your state/region instance
+
+# State/Region Information
+NEXT_PUBLIC_STATE_NAME=Oregon
+NEXT_PUBLIC_STATE_ABBREVIATION=OR
+NEXT_PUBLIC_REGION_NAME=Oregon
+
+# Organization Information
+NEXT_PUBLIC_ORG_NAME=FTC12808 RevAmped
+NEXT_PUBLIC_ORG_LOCATION=Portland, Oregon
+NEXT_PUBLIC_ORG_WEBSITE=https://revampedrobotics.org
+NEXT_PUBLIC_ORG_EMAIL=revampedrobotics@gmail.com
+
+# Contact Information
+NEXT_PUBLIC_CONTACT_EMAIL=revampedrobotics@gmail.com
+# NEXT_PUBLIC_SUPPORT_EMAIL=optional-support@example.com
+
+# App Branding
+NEXT_PUBLIC_APP_NAME=FIRST TeamMatch Oregon
+NEXT_PUBLIC_APP_DESCRIPTION=Connecting passionate students with competitive FIRST robotics teams in Oregon.
+# NEXT_PUBLIC_DEPLOYMENT_URL=https://your-domain.com
+
+# ============================================
+# FIREBASE CONFIGURATION
+# ============================================
 # Firebase Web App Configuration (from Firebase Console > Project Settings > Your apps)
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com

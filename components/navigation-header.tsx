@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Users, UserPlus, Menu, X, LogIn, LogOut, Bug } from "lucide-react";
 import Image from "next/image";
 import { getSession, signOut, getUserProfile, onAuthStateChanged, auth, isFirebaseConfigured } from "@/lib/auth";
+import { appConfig } from "@/lib/config";
 
 export function NavigationHeader() {
   const pathname = usePathname();
@@ -54,7 +55,7 @@ Additional Details:
 `;
 
     setBugReportUrl(
-      `mailto:vedrshah@icloud.com?subject=${encodeURIComponent(
+      `mailto:${appConfig.contactEmail}?subject=${encodeURIComponent(
         subject
       )}&body=${encodeURIComponent(body)}`
     );

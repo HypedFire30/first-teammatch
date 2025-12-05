@@ -994,11 +994,15 @@ export default function AdminPage() {
                           onClick={async (e) => {
                             e.stopPropagation();
                             try {
-                              const resumeUrl = await getResumeUrl(student.resume_url);
+                              const resumeUrl = await getResumeUrl(
+                                student.resume_url
+                              );
                               if (resumeUrl) {
                                 window.open(resumeUrl, "_blank");
                               } else {
-                                alert("Failed to load resume. Please try again.");
+                                alert(
+                                  "Failed to load resume. Please try again."
+                                );
                               }
                             } catch (error) {
                               console.error("Error loading resume:", error);
