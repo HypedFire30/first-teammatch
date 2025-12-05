@@ -1,4 +1,4 @@
-# FIRST Robotics Registration System
+# FIRST TeamMatch
 
 A modern platform for matching students with FIRST Robotics teams, featuring a streamlined registration process and intuitive user interface.
 
