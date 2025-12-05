@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ExternalLink,
   AlertTriangle,
+  Github,
 } from "lucide-react";
 import { appConfig } from "@/lib/config";
 
@@ -45,9 +46,25 @@ export default function SetupPage() {
               Back to Home
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Setup Instructions
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900">
+              Setup Instructions
+            </h1>
+            <Button
+              asChild
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-100 w-full sm:w-auto"
+            >
+              <a
+                href="https://github.com/HypedFire30/first-teammatch"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="h-4 w-4 mr-2" />
+                GitHub
+              </a>
+            </Button>
+          </div>
           <p className="text-lg text-gray-600">
             Follow these steps to set up your own FIRST TeamMatch instance for
             your state or region.
@@ -262,8 +279,15 @@ export default function SetupPage() {
                     <li>Click Enable</li>
                     <li>
                       Go to Rules tab, replace with rules from{" "}
-                      <code className="bg-gray-100 px-1 rounded">firestore.rules</code> in
-                      this repository, click Publish
+                      <a
+                        href="https://github.com/HypedFire30/first-teammatch/blob/main/firestore.rules"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline font-mono bg-gray-100 px-1 rounded"
+                      >
+                        firestore.rules
+                      </a>{" "}
+                      in this repository, click Publish
                     </li>
                   </ol>
                 </div>
@@ -280,8 +304,15 @@ export default function SetupPage() {
                     <li>Click Done</li>
                     <li>
                       Go to Rules tab, replace with rules from{" "}
-                      <code className="bg-gray-100 px-1 rounded">storage.rules</code> in
-                      this repository, click Publish
+                      <a
+                        href="https://github.com/HypedFire30/first-teammatch/blob/main/storage.rules"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline font-mono bg-gray-100 px-1 rounded"
+                      >
+                        storage.rules
+                      </a>{" "}
+                      in this repository, click Publish
                     </li>
                   </ol>
                 </div>
