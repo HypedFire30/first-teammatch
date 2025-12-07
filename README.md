@@ -2,9 +2,11 @@
 
 A modern, franchisable platform for matching students with FIRST Robotics teams. Built by FTC12808 RevAmped to strengthen the FIRST community, this app can be easily deployed for any state or region.
 
+> 📖 **Need detailed setup instructions?** Visit our [interactive setup guide](https://first-teammatch.vercel.app/setup) for step-by-step instructions with code examples, database setup options, and an interactive checklist.
+
 ## 🌟 Overview
 
-FIRST TeamMatch is designed to be **franchisable** - meaning any FIRST team or organization can set up their own instance for their state or region. Each instance has its own database, configuration, and branding, allowing teams to manage their own matching platform independently.
+FIRST TeamMatch is designed to be **franchisable - meaning any FIRST team or organization can set up their own instance for their state or region. Each instance has its own database, configuration, and branding, allowing teams to manage their own matching platform independently.
 
 ### Key Features
 
@@ -15,114 +17,50 @@ FIRST TeamMatch is designed to be **franchisable** - meaning any FIRST team or o
 - **State-Specific Configuration**: Easy customization for your state/region
 - **Self-Hosted**: Deploy anywhere - Vercel, AWS, your own server, etc.
 
-## 🚀 Complete Setup Instructions
+## 🚀 Quick Setup
 
 ### Prerequisites
 
 - Node.js 18+ and npm
 - A Firebase account (free tier works)
 - A GitHub account (for cloning the repository)
-- Basic knowledge of command line and web development
 
 ### Step 1: Clone and Install
 
 ```bash
-git clone https://github.com/your-org/first-teammatch.git
+git clone https://github.com/HypedFire30/first-teammatch.git
 cd first-teammatch
 npm install
 ```
 
 ### Step 2: Configure Your Instance
 
-1. Copy the environment template:
-   ```bash
-   cp env-template.txt .env.local
-   ```
-
-2. Open `.env.local` and customize the application configuration:
-
-   ```env
-   # State/Region Information
-   NEXT_PUBLIC_STATE_NAME=YourState
-   NEXT_PUBLIC_STATE_ABBREVIATION=XX
-   NEXT_PUBLIC_REGION_NAME=YourState
-
-   # Organization Information
-   NEXT_PUBLIC_ORG_NAME=Your Team Name
-   NEXT_PUBLIC_ORG_LOCATION=City, State
-   NEXT_PUBLIC_ORG_WEBSITE=https://your-team-website.org
-   NEXT_PUBLIC_ORG_EMAIL=your-email@example.com
-
-   # Contact Information
-   NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-
-   # App Branding
-   NEXT_PUBLIC_APP_NAME=FIRST TeamMatch YourState
-   NEXT_PUBLIC_APP_DESCRIPTION=Connecting passionate students with competitive FIRST robotics teams in YourState.
-   ```
+1. Copy the environment template: `cp env-template.txt .env.local`
+2. Edit `.env.local` and set your state/organization information:
+   - `NEXT_PUBLIC_STATE_NAME` - Your state name
+   - `NEXT_PUBLIC_ORG_NAME` - Your team name
+   - `NEXT_PUBLIC_ORG_LOCATION` - Your location
+   - `NEXT_PUBLIC_ORG_EMAIL` - Your contact email
+   - `NEXT_PUBLIC_APP_NAME` - Your app name
+   - See `env-template.txt` for all options
 
 ### Step 3: Set Up Firebase
 
-#### Create Firebase Project
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click "Add project" and enter a project name (e.g., "first-teammatch-california")
-3. Follow the setup wizard (Google Analytics is optional)
-
-#### Enable Authentication
-
-1. Go to **Authentication** → **Get started**
-2. Click **Sign-in method** tab
-3. Enable **Email/Password** provider
-4. Click **Save**
-
-#### Create Firestore Database
-
-1. Go to **Firestore Database** → **Create database**
-2. Choose **Start in production mode**
-3. Select a location closest to your users
-4. Click **Enable**
-5. Go to **Rules** tab, replace with rules from `firestore.rules` in this repository, click **Publish**
-
-#### Set Up Firebase Storage
-
-1. Go to **Storage** → **Get started**
-2. Choose **Start in production mode**
-3. Use the same location as your Firestore database
-4. Click **Done**
-5. Go to **Rules** tab, replace with rules from `storage.rules` in this repository, click **Publish**
-
-#### Get Firebase Configuration
-
-1. Go to **Project Settings** (gear icon) → **Your apps**
-2. Click the **Web** icon (`</>`) to add a web app
-3. Register your app (nickname is optional)
-4. Copy the Firebase configuration values and add to `.env.local`:
-
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable **Email/Password** authentication
+3. Create **Firestore Database** (production mode)
+4. Set up **Firebase Storage** (production mode)
+5. Copy security rules from [`firestore.rules`](https://github.com/HypedFire30/first-teammatch/blob/main/firestore.rules) and [`storage.rules`](https://github.com/HypedFire30/first-teammatch/blob/main/storage.rules)
+6. Get your Firebase config from Project Settings → Your apps → Web
+7. Add Firebase config to `.env.local`:
    ```env
-   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
    NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
    ```
-
-#### Firebase Admin SDK (Optional, for scripts)
-
-If you plan to use admin scripts:
-
-1. Go to **Project Settings** → **Service accounts**
-2. Click **Generate new private key** and download the JSON file
-3. Extract `private_key` and `client_email` values
-4. Add to `.env.local`:
-
-   ```env
-   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-   FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
-   ```
-
-   **Note**: The private key should be on a single line with `\n` for newlines.
 
 ### Step 4: Test Locally
 
@@ -130,41 +68,25 @@ If you plan to use admin scripts:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. You should see your customized homepage.
+Visit [http://localhost:3000](http://localhost:3000) to see your customized homepage.
 
-### Step 5: Create Your First Admin Account
+### Step 5: Create Admin Account
 
-1. Register a new account through the app (use "I'm a Student" or "I'm a Team" button)
-2. Use the admin management script to promote them to admin:
-   ```bash
-   npm run manage:admins -- add your-email@example.com
-   ```
-   
-   Or manually in Firebase Console:
-   - Go to Firestore Database
-   - Create a document in the `admins` collection
-   - Document ID: the user's UID (found in Authentication → Users)
-   - Add field: `email` (string) = the user's email
+1. Register an account through the app
+2. Run: `npm run manage:admins -- add your-email@example.com`
+3. Or manually: Create document in Firestore `admins` collection with user's UID as document ID
 
-### Step 6: Deploy Your Instance
+### Step 6: Deploy
 
-#### Deploy to Vercel (Recommended)
+**Vercel (Recommended):**
+1. Push code to GitHub
+2. Import project in [Vercel](https://vercel.com)
+3. Add all environment variables from `.env.local`
+4. Deploy
 
-1. Push your code to GitHub
-2. Go to [Vercel](https://vercel.com) and sign in with GitHub
-3. Click "Add New Project" and import your repository
-4. Add **ALL** environment variables from your `.env.local` file (both `NEXT_PUBLIC_*` config variables and Firebase variables)
-5. Click "Deploy"
+**Other Platforms:** AWS Amplify, Netlify, Railway, or your own server
 
-#### Deploy to Other Platforms
-
-The app can be deployed to any platform that supports Next.js:
-- **AWS Amplify**: Connect GitHub repo and add environment variables
-- **Netlify**: Connect GitHub repo and add environment variables
-- **Railway**: Connect GitHub repo and add environment variables
-- **Your own server**: Build with `npm run build` and run with `npm start`
-
-For any deployment, ensure all environment variables are set, Node.js 18+ is available, and the build completes successfully.
+> 💡 **For detailed instructions**, visit [first-teammatch.vercel.app/setup](https://first-teammatch.vercel.app/setup)
 
 ## 📋 Configuration Reference
 
@@ -192,10 +114,6 @@ For any deployment, ensure all environment variables are set, Node.js 18+ is ava
 
 ## 🛠️ Admin Management
 
-### Creating Admins
-
-Use the admin management script:
-
 ```bash
 # Add an admin
 npm run manage:admins -- add user@example.com
@@ -207,40 +125,20 @@ npm run manage:admins -- remove user@example.com
 npm run manage:admins -- list
 ```
 
-Or manually in Firebase Console:
-1. Go to Firestore Database
-2. Create/edit document in `admins` collection
-3. Document ID = user's UID (from Authentication)
-4. Add `email` field with user's email
-
-### Data Migration (Optional)
-
-If you have existing data in Supabase to migrate:
-
-1. Add Supabase credentials to `.env.local`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
-
-2. Run migration:
-   ```bash
-   npm run migrate:firebase
-   ```
-
-This migrates all students, teams, and admins. Auth users need to be migrated separately or use password reset flow.
+Or manually in Firebase Console: Create/edit document in `admins` collection with user's UID as document ID.
 
 ## 🔒 Security Checklist
 
-Before going live, ensure:
+Before going live:
+- [ ] Firestore security rules published
+- [ ] Storage security rules published
+- [ ] Admin accounts set up
+- [ ] Environment variables set in production
+- [ ] Firebase Authentication enabled
+- [ ] Registration flow tested
+- [ ] Admin dashboard tested
 
-- [ ] Firestore security rules are published
-- [ ] Storage security rules are published
-- [ ] Admin accounts are properly set up
-- [ ] Environment variables are set in production (not just `.env.local`)
-- [ ] Firebase Authentication is enabled
-- [ ] You've tested the registration flow
-- [ ] You've tested the admin dashboard
+> 📋 **Interactive checklist available at** [first-teammatch.vercel.app/setup](https://first-teammatch.vercel.app/setup)
 
 ## 📝 Project Structure
 
@@ -250,6 +148,7 @@ first-teammatch/
 │   ├── admin/                    # Admin dashboard
 │   ├── dashboard/                # User dashboard
 │   ├── login/                    # Authentication
+│   ├── setup/                    # Setup instructions page
 │   ├── student-registration/     # Student signup
 │   └── team-registration/        # Team signup
 ├── components/                   # React components
@@ -262,7 +161,7 @@ first-teammatch/
 │   └── utils.ts                  # Utilities
 ├── scripts/                      # Utility scripts
 │   ├── manage-admins.ts          # Admin management
-│   └── migrate-to-firebase.ts    # Data migration
+│   └── import-auth-accounts.ts   # Auth account import
 ├── firestore.rules               # Firestore security rules
 ├── storage.rules                 # Storage security rules
 └── env-template.txt              # Environment variable template
@@ -271,7 +170,7 @@ first-teammatch/
 ## 🏗️ Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
-- **Database**: Firebase Firestore
+- **Database**: Firebase Firestore (Supabase also supported)
 - **Authentication**: Firebase Auth
 - **Storage**: Firebase Storage
 - **UI**: Tailwind CSS, Shadcn UI, Radix UI
@@ -287,18 +186,15 @@ See `lib/config.ts` for the configuration structure and `env-template.txt` for a
 ## 🐛 Troubleshooting
 
 ### Build Errors
-
 - **Firebase not configured**: Make sure all `NEXT_PUBLIC_FIREBASE_*` variables are set
 - **Type errors**: Run `npm install` to ensure all dependencies are installed
 
 ### Runtime Errors
-
 - **"Firestore is not initialized"**: Check your Firebase environment variables
 - **Authentication not working**: Verify Email/Password is enabled in Firebase Console
 - **Can't upload files**: Check Storage security rules and ensure Storage is enabled
 
 ### Deployment Issues
-
 - **Environment variables not working**: Ensure variables are set in your deployment platform's dashboard
 - **Build fails**: Check that all required environment variables are set
 - **App shows default values**: Verify `NEXT_PUBLIC_*` variables are set correctly
@@ -306,16 +202,15 @@ See `lib/config.ts` for the configuration structure and `env-template.txt` for a
 ## 📞 Support
 
 For questions or issues:
-
 1. Check this README and the troubleshooting section
-2. Review Firebase documentation for setup issues
-3. Open an issue on GitHub (if applicable)
-4. Contact the original developers: revampedrobotics@gmail.com
+2. Visit the [detailed setup guide](https://first-teammatch.vercel.app/setup)
+3. Review Firebase documentation for setup issues
+4. Open an issue on GitHub
+5. Contact: revampedrobotics@gmail.com
 
 ## 🤝 Contributing
 
 This is a franchisable project. If you've set up your own instance and made improvements:
-
 1. Consider contributing back to the main repository
 2. Share your improvements with other state instances
 3. Help build a stronger FIRST community
