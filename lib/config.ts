@@ -58,3 +58,5 @@ export function getAppConfig(): AppConfig {
 // Export a singleton instance for use throughout the app
 export const appConfig = getAppConfig();
 
+
+

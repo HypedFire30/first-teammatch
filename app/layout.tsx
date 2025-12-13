@@ -21,7 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NavigationHeader />
-        <main className="min-h-screen bg-white page-enter">{children}</main>
+        <main className="min-h-screen bg-white page-enter relative">
+          <div className="fixed top-16 left-0 right-0 h-32 pointer-events-none z-40 bg-gradient-to-b from-white via-white/60 to-transparent"></div>
+          {children}
+        </main>
       </body>
     </html>
   );

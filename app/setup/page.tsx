@@ -103,15 +103,15 @@ export default function SetupPage() {
             <p className="text-gray-700">
               Clone the repository and install dependencies:
             </p>
-            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-              <div className="mb-2">
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto w-full min-w-0">
+              <div className="mb-2 whitespace-nowrap">
                 <span className="text-gray-400">$</span> git clone
                 https://github.com/your-org/first-teammatch.git
               </div>
-              <div className="mb-2">
+              <div className="mb-2 whitespace-nowrap">
                 <span className="text-gray-400">$</span> cd first-teammatch
               </div>
-              <div>
+              <div className="whitespace-nowrap">
                 <span className="text-gray-400">$</span> npm install
               </div>
             </div>
@@ -132,8 +132,8 @@ export default function SetupPage() {
             <p className="text-gray-700">
               Copy the environment template and customize it:
             </p>
-            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto mb-4">
-              <div>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto w-full min-w-0 mb-4">
+              <div className="whitespace-nowrap">
                 <span className="text-gray-400">$</span> cp env-template.txt
                 .env.local
               </div>
@@ -142,31 +142,31 @@ export default function SetupPage() {
               Open <code className="bg-gray-100 px-2 py-1 rounded">.env.local</code> and
               customize the following:
             </p>
-            <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
-              <div className="space-y-3 text-sm font-mono">
+            <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
+              <div className="space-y-3 text-sm font-mono min-w-max">
                 <div>
                   <span className="text-gray-500"># State/Region Information</span>
                   <div className="ml-4 mt-1">
-                    <div>NEXT_PUBLIC_STATE_NAME=YourState</div>
-                    <div>NEXT_PUBLIC_STATE_ABBREVIATION=XX</div>
-                    <div>NEXT_PUBLIC_REGION_NAME=YourState</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_STATE_NAME=YourState</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_STATE_ABBREVIATION=XX</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_REGION_NAME=YourState</div>
                   </div>
                 </div>
                 <div>
                   <span className="text-gray-500"># Organization Information</span>
                   <div className="ml-4 mt-1">
-                    <div>NEXT_PUBLIC_ORG_NAME=Your Team Name</div>
-                    <div>NEXT_PUBLIC_ORG_LOCATION=City, State</div>
-                    <div>NEXT_PUBLIC_ORG_WEBSITE=https://your-team-website.org</div>
-                    <div>NEXT_PUBLIC_ORG_EMAIL=your-email@example.com</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_NAME=Your Team Name</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_LOCATION=City, State</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_WEBSITE=https://your-team-website.org</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_EMAIL=your-email@example.com</div>
                   </div>
                 </div>
                 <div>
                   <span className="text-gray-500"># Contact & Branding</span>
                   <div className="ml-4 mt-1">
-                    <div>NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com</div>
-                    <div>NEXT_PUBLIC_APP_NAME=FIRST TeamMatch YourState</div>
-                    <div>NEXT_PUBLIC_APP_DESCRIPTION=Connecting students...</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_APP_NAME=FIRST TeamMatch YourState</div>
+                    <div className="whitespace-nowrap">NEXT_PUBLIC_APP_DESCRIPTION=Connecting students...</div>
                   </div>
                 </div>
               </div>
@@ -329,14 +329,14 @@ export default function SetupPage() {
                     <li>Copy the Firebase configuration values</li>
                     <li>Add them to your .env.local file</li>
                   </ol>
-                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
-                    <div className="space-y-2 text-sm font-mono">
-                      <div>NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here</div>
-                      <div>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com</div>
-                      <div>NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id</div>
-                      <div>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com</div>
-                      <div>NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id</div>
-                      <div>NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
+                    <div className="space-y-2 text-sm font-mono min-w-max">
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id</div>
                     </div>
                   </div>
                 </div>
@@ -420,11 +420,11 @@ export default function SetupPage() {
                     <li>Copy your Project URL and anon/public key</li>
                     <li>Add them to your .env.local file</li>
                   </ol>
-                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
-                    <div className="space-y-2 text-sm font-mono">
-                      <div>NEXT_PUBLIC_SUPABASE_URL=your-project-url</div>
-                      <div>NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key</div>
-                      <div>SUPABASE_SERVICE_ROLE_KEY=your-service-role-key</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
+                    <div className="space-y-2 text-sm font-mono min-w-max">
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_SUPABASE_URL=your-project-url</div>
+                      <div className="whitespace-nowrap">NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key</div>
+                      <div className="whitespace-nowrap">SUPABASE_SERVICE_ROLE_KEY=your-service-role-key</div>
                     </div>
                   </div>
                 </div>
@@ -445,8 +445,8 @@ export default function SetupPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-700">Start the development server:</p>
-            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-              <div>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto w-full min-w-0">
+              <div className="whitespace-nowrap">
                 <span className="text-gray-400">$</span> npm run dev
               </div>
             </div>
@@ -481,8 +481,8 @@ export default function SetupPage() {
               </li>
               <li>
                 Use the admin management script to promote them to admin:
-                <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm mt-2 overflow-x-auto">
-                  <div>
+                <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm mt-2 overflow-x-auto w-full min-w-0">
+                  <div className="whitespace-nowrap">
                     <span className="text-gray-400">$</span> npm run manage:admins
                     -- add your-email@example.com
                   </div>

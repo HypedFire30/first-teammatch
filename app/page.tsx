@@ -41,11 +41,11 @@ export default function HomePage() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-row gap-3 sm:gap-4 justify-center items-center">
               <Button
                 onClick={() => router.push("/student-registration")}
                 size="lg"
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base font-medium rounded-lg transition-colors"
+                className="flex-1 sm:flex-none sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-8 py-6 text-sm sm:text-base font-medium rounded-lg transition-colors"
               >
                 <Users className="h-5 w-5 mr-2" />
                 I'm a Student
@@ -56,7 +56,7 @@ export default function HomePage() {
                 onClick={() => router.push("/team-registration")}
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-8 py-6 text-base font-medium rounded-lg transition-colors"
+                className="flex-1 sm:flex-none sm:w-auto border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-3 sm:px-8 py-6 text-sm sm:text-base font-medium rounded-lg transition-colors"
               >
                 <Target className="h-5 w-5 mr-2" />
                 I'm a Team
@@ -219,9 +219,10 @@ export default function HomePage() {
                 About RevAmped
               </h3>
               <p className="text-base text-gray-600 leading-relaxed mb-4">
-                {appConfig.organizationName} is a competitive FIRST Tech Challenge team
-                based in {appConfig.organizationLocation}. We're passionate about robotics,
-                innovation, and building a stronger FIRST community.
+                {appConfig.organizationName} is a competitive FIRST Tech
+                Challenge team based in {appConfig.organizationLocation}. We're
+                passionate about robotics, innovation, and building a stronger
+                FIRST community.
               </p>
               <div className="flex items-center text-base text-gray-600">
                 <MapPin className="h-4 w-4 mr-2" />

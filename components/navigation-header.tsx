@@ -4,9 +4,25 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Menu, X, LogIn, LogOut, Bug } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  Menu,
+  X,
+  LogIn,
+  LogOut,
+  Bug,
+  BookOpen,
+} from "lucide-react";
 import Image from "next/image";
-import { getSession, signOut, getUserProfile, onAuthStateChanged, auth, isFirebaseConfigured } from "@/lib/auth";
+import {
+  getSession,
+  signOut,
+  getUserProfile,
+  onAuthStateChanged,
+  auth,
+  isFirebaseConfigured,
+} from "@/lib/auth";
 import { appConfig } from "@/lib/config";
 
 export function NavigationHeader() {
@@ -103,7 +119,7 @@ Additional Details:
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -126,22 +142,27 @@ Additional Details:
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-            {/* Bug Report Button */}
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            {/* Setup Guide Link */}
+            <Link
+              href="/setup"
+              className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors flex items-center space-x-1.5"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Setup Guide</span>
+            </Link>
+
+            {/* Bug Report Link */}
             <a
               href={bugReportUrl || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className={!bugReportUrl ? "pointer-events-none opacity-50" : ""}
+              className={`text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors flex items-center space-x-1.5 ${
+                !bugReportUrl ? "pointer-events-none opacity-50" : ""
+              }`}
             >
-              <Button
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm"
-              >
-                <Bug className="h-4 w-4" />
-                <span className="hidden lg:inline">Bug Report</span>
-                <span className="lg:hidden">Report</span>
-              </Button>
+              <Bug className="h-4 w-4" />
+              <span>Bug Report</span>
             </a>
 
             {!isLoading && !isLoginPage && !isAuthenticated && (
@@ -153,35 +174,43 @@ Additional Details:
               </Link>
             )}
 
-            {!isLoading && isAuthenticated && (isDashboardPage || isAdminPage) && (
-              <Button
-                onClick={async () => {
-                  await signOut();
-                  window.location.href = "/";
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Log Out</span>
-              </Button>
-            )}
-
-            {!isLoading && isAuthenticated && userType === "admin" && !isAdminPage && (
-              <Link href="/admin">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
-                  Admin
+            {!isLoading &&
+              isAuthenticated &&
+              (isDashboardPage || isAdminPage) && (
+                <Button
+                  onClick={async () => {
+                    await signOut();
+                    window.location.href = "/";
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Log Out</span>
                 </Button>
-              </Link>
-            )}
+              )}
 
-            {!isLoading && isAuthenticated && userType !== "admin" && !isDashboardPage && (
-              <Link href="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
-                  Dashboard
-                </Button>
-              </Link>
-            )}
-          </div>
+            {!isLoading &&
+              isAuthenticated &&
+              userType === "admin" &&
+              !isAdminPage && (
+                <Link href="/admin">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+                    Admin
+                  </Button>
+                </Link>
+              )}
+
+            {!isLoading &&
+              isAuthenticated &&
+              userType !== "admin" &&
+              !isDashboardPage && (
+                <Link href="/dashboard">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+                    Dashboard
+                  </Button>
+                </Link>
+              )}
+          </nav>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
@@ -202,24 +231,30 @@ Additional Details:
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="md:hidden bg-white/95 backdrop-blur-md">
             <div className="px-6 py-4 space-y-3">
-              {/* Bug Report Button - Mobile */}
+              {/* Setup Guide Link - Mobile */}
+              <Link
+                href="/setup"
+                className="block text-gray-700 hover:text-gray-900 font-medium py-3 px-4 rounded-lg transition-colors flex items-center space-x-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <BookOpen className="h-4 w-4" />
+                <span>Setup Guide</span>
+              </Link>
+
+              {/* Bug Report Link - Mobile */}
               <a
                 href={bugReportUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={
+                className={`block text-gray-700 hover:text-gray-900 font-medium py-3 px-4 rounded-lg transition-colors flex items-center space-x-2 ${
                   !bugReportUrl ? "pointer-events-none opacity-50" : ""
-                }
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                  <Bug className="h-4 w-4" />
-                  <span>Bug Report</span>
-                </Button>
+                <Bug className="h-4 w-4" />
+                <span>Bug Report</span>
               </a>
 
               {!isLoading && !isLoginPage && !isAuthenticated && (
@@ -231,34 +266,42 @@ Additional Details:
                 </Link>
               )}
 
-              {!isLoading && isAuthenticated && (isDashboardPage || isAdminPage) && (
-                <Button
-                  onClick={async () => {
-                    await signOut();
-                    window.location.href = "/";
-                  }}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Log Out</span>
-                </Button>
-              )}
-
-              {!isLoading && isAuthenticated && userType === "admin" && !isAdminPage && (
-                <Link href="/admin">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
-                    Admin
+              {!isLoading &&
+                isAuthenticated &&
+                (isDashboardPage || isAdminPage) && (
+                  <Button
+                    onClick={async () => {
+                      await signOut();
+                      window.location.href = "/";
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Log Out</span>
                   </Button>
-                </Link>
-              )}
+                )}
 
-              {!isLoading && isAuthenticated && userType !== "admin" && !isDashboardPage && (
-                <Link href="/dashboard">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
-                    Dashboard
-                  </Button>
-                </Link>
-              )}
+              {!isLoading &&
+                isAuthenticated &&
+                userType === "admin" &&
+                !isAdminPage && (
+                  <Link href="/admin">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+
+              {!isLoading &&
+                isAuthenticated &&
+                userType !== "admin" &&
+                !isDashboardPage && (
+                  <Link href="/dashboard">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                      Dashboard
+                    </Button>
+                  </Link>
+                )}
             </div>
           </div>
         )}
