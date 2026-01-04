@@ -281,8 +281,16 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-gray-200 pt-6 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-2">
               © 2025 {appConfig.appName}. Built by {appConfig.organizationName}.
+            </p>
+            <p className="text-sm text-gray-500">
+              <Link
+                href="/privacy"
+                className="text-gray-500 hover:text-gray-700 underline"
+              >
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </div>

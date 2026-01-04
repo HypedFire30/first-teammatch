@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle } from "lucide-react";
 import { signUp } from "@/lib/auth";
 import { PasswordInput } from "@/components/ui/password-input";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 const studentRegistrationSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -378,9 +379,14 @@ export default function StudentRegistrationPage() {
 
             {/* Question */}
             <div className="mb-8 transition-all duration-300 ease-in-out form-step-enter">
-              <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                {getQuestion(currentStep)}
-              </h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-semibold text-gray-900">
+                  {getQuestion(currentStep)}
+                </h2>
+                <InfoTooltip
+                  content="By submitting this form, you consent to the use of your name, email address, grade level, and qualifications for the purpose of matching you with qualified FIRST robotics teams. Your information will only be shared with registered teams for matching purposes."
+                />
+              </div>
 
               {/* Input fields */}
               <div className="space-y-4">

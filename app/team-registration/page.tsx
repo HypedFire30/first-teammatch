@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle } from "lucide-react";
 import { signUp } from "@/lib/auth";
 import { PasswordInput } from "@/components/ui/password-input";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 const teamRegistrationSchema = z.object({
   teamName: z.string().min(1, "Team name is required"),
@@ -397,9 +398,14 @@ export default function TeamRegistrationPage() {
               <div className="space-y-4">
                 {currentStep === 0 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What's your team name?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What's your team name?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Input
                       {...register("teamName")}
                       placeholder="Team name"
@@ -417,9 +423,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 1 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What's your email?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What's your email?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Input
                       type="email"
                       {...register("email")}
@@ -438,9 +449,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 2 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      Create a password
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        Create a password
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <PasswordInput
                       value={watch("password") || ""}
                       onChange={(value) => setValue("password", value)}
@@ -459,9 +475,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 3 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What FIRST level is your team?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What FIRST level is your team?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Select
                       value={watch("firstLevel") || ""}
                       onValueChange={(value) => {
@@ -485,9 +506,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 4 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What's your zip code??
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What's your zip code??
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Input
                       {...register("zipCode")}
                       placeholder="12345"
@@ -505,9 +531,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 5 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      Is this a school team?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        Is this a school team?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <div
                       className="space-y-3"
                       onKeyDown={(e) => {
@@ -551,9 +582,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 6 && watch("isSchoolTeam") && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What's your school name?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What's your school name?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Input
                       {...register("schoolName")}
                       placeholder="School name"
@@ -571,9 +607,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 7 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What areas do you need help with?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What areas do you need help with?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <div
                       className="space-y-3"
                       onKeyDown={(e) => {
@@ -602,9 +643,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 8 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What grade range are you looking for?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What grade range are you looking for?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Input
@@ -653,9 +699,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 9 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      How many hours per week do you expect from students?
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        How many hours per week do you expect from students?
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <div
                       className="space-y-4"
                       onKeyDown={(e) => {
@@ -687,9 +738,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 10 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      Tell us about your team's achievements
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        Tell us about your team's achievements
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <Textarea
                       {...register("teamAwards")}
                       placeholder="List your team's awards and accomplishments..."
@@ -708,9 +764,14 @@ export default function TeamRegistrationPage() {
 
                 {currentStep === 11 && (
                   <>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-8">
-                      What qualities are you looking for? (Select up to 3)
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-semibold text-gray-900">
+                        What qualities are you looking for? (Select up to 3)
+                      </h2>
+                      <InfoTooltip
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                      />
+                    </div>
                     <div className="space-y-3">
                       {qualities.map((quality) => {
                         const isDisabled =
