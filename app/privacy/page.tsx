@@ -68,6 +68,13 @@ export default function PrivacyPolicyPage() {
               students and teams.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
+              <strong>Data Storage:</strong> Your information is stored in a
+              Google Firebase database. Firebase provides secure cloud storage
+              and authentication services. Your data is protected by Firebase's
+              security measures and is subject to Google's privacy policies
+              regarding data storage and processing.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-4">
               If you have questions regarding this policy or wish to request
               deletion of your account and associated data, please contact us
               at{" "}
