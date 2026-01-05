@@ -75,6 +75,13 @@ export default function PrivacyPolicyPage() {
               regarding data storage and processing.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
+              <strong>Age Restrictions:</strong> To follow U.S. and international
+              law, we do not collect data directly from youth under the age of 13
+              and we do not allow them to create accounts on our websites. Youth
+              ages 13-17 will submit data and create an account with parental
+              consent.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-4">
               If you have questions regarding this policy or wish to request
               deletion of your account and associated data, please contact us
               at{" "}

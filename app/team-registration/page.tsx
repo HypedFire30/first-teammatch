@@ -403,7 +403,7 @@ export default function TeamRegistrationPage() {
                         What's your team name?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Input
@@ -428,7 +428,7 @@ export default function TeamRegistrationPage() {
                         What's your email?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Input
@@ -454,7 +454,7 @@ export default function TeamRegistrationPage() {
                         Create a password
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <PasswordInput
@@ -480,7 +480,7 @@ export default function TeamRegistrationPage() {
                         What FIRST level is your team?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Select
@@ -511,7 +511,7 @@ export default function TeamRegistrationPage() {
                         What's your zip code??
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Input
@@ -536,7 +536,7 @@ export default function TeamRegistrationPage() {
                         Is this a school team?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <div
@@ -587,7 +587,7 @@ export default function TeamRegistrationPage() {
                         What's your school name?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Input
@@ -612,7 +612,7 @@ export default function TeamRegistrationPage() {
                         What areas do you need help with?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <div
@@ -648,7 +648,7 @@ export default function TeamRegistrationPage() {
                         What grade range are you looking for?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -704,7 +704,7 @@ export default function TeamRegistrationPage() {
                         How many hours per week do you expect from students?
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <div
@@ -743,7 +743,7 @@ export default function TeamRegistrationPage() {
                         Tell us about your team's achievements
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <Textarea
@@ -769,7 +769,7 @@ export default function TeamRegistrationPage() {
                         What qualities are you looking for? (Select up to 3)
                       </h2>
                       <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes."
+                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                       />
                     </div>
                     <div className="space-y-3">

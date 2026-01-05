@@ -384,7 +384,7 @@ export default function StudentRegistrationPage() {
                   {getQuestion(currentStep)}
                 </h2>
                 <InfoTooltip
-                  content="By submitting this form, you consent to the use of your name, email address, grade level, and qualifications for the purpose of matching you with qualified FIRST robotics teams. Your information will only be shared with registered teams for matching purposes."
+                  content="By submitting this form, you consent to the use of your name, email address, grade level, and qualifications for the purpose of matching you with qualified FIRST robotics teams. Your information will only be shared with registered teams for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
                 />
               </div>
 
