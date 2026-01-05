@@ -347,7 +347,7 @@ export default function StudentRegistrationPage() {
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <div className="w-full max-w-3xl px-6 sm:px-8 lg:px-12">
-        <form 
+        <form
           onSubmit={handleSubmit(onSubmit)}
           onKeyDown={(e) => {
             // Prevent form submission on Enter key when on last step
@@ -383,9 +383,7 @@ export default function StudentRegistrationPage() {
                 <h2 className="text-3xl font-semibold text-gray-900">
                   {getQuestion(currentStep)}
                 </h2>
-                <InfoTooltip
-                  content="By submitting this form, you consent to the use of your name, email address, grade level, and qualifications for the purpose of matching you with qualified FIRST robotics teams. Your information will only be shared with registered teams for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                />
+                <InfoTooltip content="By submitting this form, you consent to the use of your name, email address, grade level, and qualifications for the purpose of matching you with qualified FIRST robotics teams. Your information will only be shared with registered teams for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
               </div>
 
               {/* Input fields */}
@@ -488,7 +486,7 @@ export default function StudentRegistrationPage() {
                 )}
 
                 {currentStep === 5 && (
-                  <div 
+                  <div
                     className="space-y-3"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && selectedAreas.length > 0) {
@@ -547,7 +545,7 @@ export default function StudentRegistrationPage() {
                 )}
 
                 {currentStep === 8 && (
-                  <div 
+                  <div
                     className="space-y-4"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
