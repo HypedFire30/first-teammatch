@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,19 @@ import {
   Star,
   Building2,
   Bot,
-  Code,
+  Search,
 } from "lucide-react";
 import { appConfig } from "@/lib/config";
 import Link from "next/link";
+
+interface SearchFilters {
+  firstLevel: string;
+  zipCode: string;
+  areasOfNeed: string[];
+  gradeRange: number;
+  timeCommitment: number;
+  qualities: string[];
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -43,7 +52,7 @@ export default function HomePage() {
             {/* CTA Buttons */}
             <div className="flex flex-row gap-3 sm:gap-4 justify-center items-center">
               <Button
-                onClick={() => router.push("/student-registration")}
+                onClick={() => router.push("/browse")}
                 size="lg"
                 className="flex-1 sm:flex-none sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-8 py-6 text-sm sm:text-base font-medium rounded-lg transition-colors"
               >
@@ -90,12 +99,12 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                  Tell Us About You
+                  Teams Register
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
-                  Students and teams create detailed profiles highlighting their
-                  skills, interests, and requirements. Tell us what makes you
-                  unique.
+                  Teams create detailed profiles highlighting their needs,
+                  location, and requirements. Students can then browse and find
+                  teams that match their interests.
                 </p>
               </div>
             </div>
@@ -109,12 +118,12 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                  Get Matched
+                  Students Browse
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
-                  Our smart algorithm analyzes compatibility based on skills,
-                  location, time commitment, and team needs to find your perfect
-                  match.
+                  Students can search and filter teams by location, FIRST level,
+                  areas of need, grade range, and more. No account required to
+                  browse.
                 </p>
               </div>
             </div>
@@ -128,11 +137,12 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                  Connect With Your Match
+                  Get Contact Information
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
-                  Connect with your match, start building relationships, and
-                  begin your robotics journey together. The perfect team awaits.
+                  After verifying you're human, students can access team contact
+                  information (email and phone) to reach out directly and start
+                  their robotics journey.
                 </p>
               </div>
             </div>
@@ -148,22 +158,21 @@ export default function HomePage() {
               Why Choose FIRST TeamMatch?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're building the future of FIRST robotics by connecting talent
-              with opportunity.
+              A public directory connecting students with FIRST robotics teams.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-8 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Star className="h-5 w-5 text-blue-600" />
+                <Search className="h-5 w-5 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Smart Matching
+                Easy Discovery
               </h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Our algorithm considers skills, interests, and team needs to
-                create the perfect match.
+                Browse and filter teams by location, expertise, and requirements
+                to find the perfect fit for your interests.
               </p>
             </div>
 
@@ -185,11 +194,11 @@ export default function HomePage() {
                 <Award className="h-5 w-5 text-red-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Proven Success
+                Growing Community
               </h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Teams and students across the country are already finding their
-                perfect match.
+                Teams across the country are joining to connect with passionate
+                students and grow the FIRST community.
               </p>
             </div>
           </div>
@@ -206,10 +215,10 @@ export default function HomePage() {
                 Our Mission
               </h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                To strengthen the FIRST robotics community by connecting
-                passionate students with competitive teams, fostering
-                innovation, and building lasting partnerships that drive the
-                future of robotics education.
+                To strengthen the FIRST robotics community by providing a public
+                directory where students can discover teams and teams can
+                connect with passionate students, fostering innovation and
+                building lasting partnerships.
               </p>
             </div>
 
@@ -264,17 +273,6 @@ export default function HomePage() {
                     <Building2 className="h-4 w-4 mr-2" />
                     Website
                   </a>
-                </Button>
-
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <Link href="/setup">
-                    <Code className="h-4 w-4 mr-2" />
-                    Setup Guide
-                  </Link>
                 </Button>
               </div>
             </div>

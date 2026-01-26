@@ -31,18 +31,57 @@ export default function PrivacyPolicyPage() {
               1. Information We Collect
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              By registering with {appConfig.appName}, you provide us with the
-              following personal information:
+              {appConfig.appName} is designed to connect students with FIRST
+              robotics teams. We collect information only from teams that
+              register with our platform. Students do not create accounts or
+              provide personal information.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
+              Team Registration Information
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              When a team registers with {appConfig.appName}, we collect the
+              following information:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Personal identification information, including name and email address</li>
-              <li>Educational information, including grade level and school name</li>
-              <li>Geographic information, including zip code for location-based matching</li>
-              <li>FIRST program participation information, including experience level and areas of interest</li>
-              <li>Qualifications and achievements, including resume documents when provided</li>
-              <li>Time commitment preferences and availability</li>
-              <li>For team registrations: Team name, contact information, requirements, and preferences</li>
+              <li>
+                Contact information: Team email address and optional phone
+                number
+              </li>
+              <li>
+                Team identification: Team name, team number, and optional website
+              </li>
+              <li>
+                Geographic information: Zip code for location-based browsing
+              </li>
+              <li>
+                FIRST program information: FIRST level (FLL, FTC, FRC, etc.)
+              </li>
+              <li>
+                Team requirements: Areas of expertise, grade range, time
+                commitment expectations
+              </li>
+              <li>
+                Additional details: School name (if applicable), team awards,
+                and desired qualities in team members
+              </li>
             </ul>
+            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">
+              Student Browsing
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Students can browse team listings on {appConfig.appName} without
+              creating an account or providing any personal information. We do
+              not collect, store, or track any data from students who browse
+              our platform.
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              When a student wishes to view a team's contact information, they
+              must complete a human verification (CAPTCHA) test. This helps
+              protect teams from automated bots accessing their contact
+              information. We do not collect or store any information about
+              students who complete this verification.
+            </p>
           </section>
 
           <section>
@@ -50,41 +89,131 @@ export default function PrivacyPolicyPage() {
               2. How We Use Your Information
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              We use the information you provide exclusively for the following
-              purposes:
+              We use team information exclusively for the following purposes:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>To facilitate matching between students and FIRST robotics teams based on qualifications, location, and preferences</li>
-              <li>To share your information with registered users (students or teams) for the purpose of facilitating matches</li>
-              <li>To enable communication between matched parties</li>
-              <li>To send you service-related communications regarding your account and potential matches</li>
-              <li>To improve and optimize our matching algorithm and service functionality</li>
+              <li>
+                To display team profiles on our public browse page, allowing
+                students to discover and learn about teams
+              </li>
+              <li>
+                To enable students to contact teams directly (after completing
+                human verification)
+              </li>
+              <li>
+                To provide teams with metrics about how many students have
+                viewed their contact information
+              </li>
+              <li>
+                To send service-related communications to teams regarding their
+                account (e.g., password reset emails)
+              </li>
+              <li>To improve and optimize our platform functionality</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mt-4">
-              We do not sell, rent, lease, or otherwise disclose your personal
+              We do not sell, rent, lease, or otherwise disclose team
               information to third parties for marketing or commercial purposes.
-              Your information is shared solely with registered users of our
-              platform for the express purpose of facilitating matches between
-              students and teams.
+              Team contact information (email and phone) is only accessible to
+              students who complete the human verification process.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
-              <strong>Data Storage:</strong> Your information is stored in a
-              Google Firebase database. Firebase provides secure cloud storage
-              and authentication services. Your data is protected by Firebase's
-              security measures and is subject to Google's privacy policies
-              regarding data storage and processing.
+              <strong>Data Storage:</strong> Team information is stored in a
+              PostgreSQL database hosted on Railway. Your data is protected by
+              industry-standard security measures, including encrypted
+              connections and secure password hashing. We use HTTP-only session
+              cookies for authentication to protect team accounts.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
-              <strong>Age Restrictions:</strong> To follow U.S. and international
-              law, we do not collect data directly from youth under the age of 13
-              and we do not allow them to create accounts on our websites. Youth
-              ages 13-17 will submit data and create an account with parental
-              consent.
+              <strong>Contact Metrics:</strong> We track when students click the
+              "Contact" button on team profiles to provide teams with insights
+              about interest in their team. This tracking does not collect any
+              student information—only the count of contact button clicks.
             </p>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              If you have questions regarding this policy or wish to request
-              deletion of your account and associated data, please contact us
-              at{" "}
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              3. Your Rights and Choices
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Teams registered with {appConfig.appName} have the following
+              rights:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>
+                <strong>Access:</strong> You can view and edit your team profile
+                information at any time through your dashboard
+              </li>
+              <li>
+                <strong>Update:</strong> You can update your team information,
+                including contact details, at any time
+              </li>
+              <li>
+                <strong>Delete:</strong> You can request deletion of your team
+                account and associated data by contacting us
+              </li>
+              <li>
+                <strong>Opt-out:</strong> You can remove your team from public
+                listings by deleting your account
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              4. Data Security
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We implement appropriate technical and organizational measures to
+              protect team information against unauthorized access, alteration,
+              disclosure, or destruction. This includes:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Encrypted database connections (SSL/TLS)</li>
+              <li>Secure password hashing (bcrypt)</li>
+              <li>HTTP-only session cookies for authentication</li>
+              <li>Regular security updates and monitoring</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              5. Children's Privacy
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              {appConfig.appName} does not collect personal information from
+              children or minors. Students can browse team listings without
+              creating accounts or providing any personal information. Only
+              teams (typically represented by adult coaches or mentors) register
+              and provide information to our platform.
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              If you are a parent or guardian and believe that a team has
+              provided information about a child in violation of this policy,
+              please contact us immediately.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              6. Changes to This Policy
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We may update this Privacy Policy from time to time. We will notify
+              registered teams of any material changes by email or through a
+              notice on our platform. The "Last updated" date at the top of this
+              page indicates when this policy was last revised.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              7. Contact Us
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              If you have questions about this Privacy Policy, wish to request
+              access to or deletion of your team data, or have any concerns
+              about how we handle information, please contact us at{" "}
               <a
                 href={`mailto:${appConfig.contactEmail}`}
                 className="text-blue-600 hover:text-blue-700 underline"

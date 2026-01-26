@@ -1,46 +1,17 @@
-# Firebase Environment Variables
-# Copy these to your .env.local file
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
 
-# ============================================
-# APPLICATION CONFIGURATION
-# ============================================
-# Customize these values for your state/region instance
+# Environment
+NODE_ENV=development
 
-# State/Region Information
+# Next.js
+NEXT_PUBLIC_APP_NAME=FIRST TeamMatch
 NEXT_PUBLIC_STATE_NAME=Oregon
 NEXT_PUBLIC_STATE_ABBREVIATION=OR
 NEXT_PUBLIC_REGION_NAME=Oregon
-
-# Organization Information
 NEXT_PUBLIC_ORG_NAME=FTC12808 RevAmped
 NEXT_PUBLIC_ORG_LOCATION=Portland, Oregon
 NEXT_PUBLIC_ORG_WEBSITE=https://revampedrobotics.org
 NEXT_PUBLIC_ORG_EMAIL=revampedrobotics@gmail.com
-
-# Contact Information
 NEXT_PUBLIC_CONTACT_EMAIL=revampedrobotics@gmail.com
-# NEXT_PUBLIC_SUPPORT_EMAIL=optional-support@example.com
-
-# App Branding
-NEXT_PUBLIC_APP_NAME=FIRST TeamMatch Oregon
 NEXT_PUBLIC_APP_DESCRIPTION=Connecting passionate students with competitive FIRST robotics teams in Oregon.
-# NEXT_PUBLIC_DEPLOYMENT_URL=https://your-domain.com
-
-# ============================================
-# FIREBASE CONFIGURATION
-# ============================================
-# Firebase Web App Configuration (from Firebase Console > Project Settings > Your apps)
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-
-# Firebase Admin SDK (for migration script - from Firebase Console > Project Settings > Service Accounts)
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
-
-# Supabase (only needed if migrating existing data)
-# NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-# SUPABASE_SERVICE_ROLE_KEY=your-service-role-key

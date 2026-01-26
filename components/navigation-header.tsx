@@ -4,25 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Users,
-  UserPlus,
-  Menu,
-  X,
-  LogIn,
-  LogOut,
-  Bug,
-  BookOpen,
-} from "lucide-react";
+import { Users, UserPlus, Menu, X, LogIn, LogOut, Bug } from "lucide-react";
 import Image from "next/image";
-import {
-  getSession,
-  signOut,
-  getUserProfile,
-  onAuthStateChanged,
-  auth,
-  isFirebaseConfigured,
-} from "@/lib/auth";
+import { getCurrentUser, signOut } from "@/lib/auth-client";
 import { appConfig } from "@/lib/config";
 
 export function NavigationHeader() {
@@ -35,7 +19,7 @@ export function NavigationHeader() {
   const isAdminPage = pathname === "/admin";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userType, setUserType] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Generate bug report email URL
@@ -79,43 +63,16 @@ Additional Details:
 
   useEffect(() => {
     async function checkAuth() {
-      const { session } = await getSession();
-      setIsAuthenticated(!!session);
-
-      if (session) {
-        // Get user profile to determine type
-        const { profile } = await getUserProfile(session.user.uid);
-        if (profile) {
-          setUserType(profile.type);
-        }
-      }
-
+      const { user, error } = await getCurrentUser();
+      setIsAuthenticated(!!user);
+      setUserRole(user?.role || null);
       setIsLoading(false);
     }
     checkAuth();
 
-    // Listen for auth state changes (only if Firebase is configured)
-    let unsubscribe: (() => void) | undefined;
-    if (isFirebaseConfigured()) {
-      unsubscribe = onAuthStateChanged(auth, async (user) => {
-        setIsAuthenticated(!!user);
-
-        if (user) {
-          const { profile } = await getUserProfile(user.uid);
-          if (profile) {
-            setUserType(profile.type);
-          }
-        } else {
-          setUserType(null);
-        }
-      });
-    }
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
+    // Check auth periodically (every 30 seconds)
+    const interval = setInterval(checkAuth, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -143,15 +100,6 @@ Additional Details:
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {/* Setup Guide Link */}
-            <Link
-              href="/setup"
-              className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors flex items-center space-x-1.5"
-            >
-              <BookOpen className="h-4 w-4" />
-              <span>Setup Guide</span>
-            </Link>
-
             {/* Bug Report Link */}
             <a
               href={bugReportUrl || "#"}
@@ -167,9 +115,11 @@ Additional Details:
 
             {!isLoading && !isLoginPage && !isAuthenticated && (
               <Link href="/login">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center space-x-2 text-sm">
-                  <LogIn className="h-4 w-4" />
-                  <span>Log In</span>
+                <Button
+                  variant="ghost"
+                  className="p-2 rounded-lg transition-colors"
+                >
+                  <LogIn className="h-5 w-5 text-gray-700" />
                 </Button>
               </Link>
             )}
@@ -191,7 +141,7 @@ Additional Details:
 
             {!isLoading &&
               isAuthenticated &&
-              userType === "admin" &&
+              userRole === "admin" &&
               !isAdminPage && (
                 <Link href="/admin">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
@@ -202,7 +152,7 @@ Additional Details:
 
             {!isLoading &&
               isAuthenticated &&
-              userType !== "admin" &&
+              userRole !== "admin" &&
               !isDashboardPage && (
                 <Link href="/dashboard">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
@@ -233,16 +183,6 @@ Additional Details:
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md">
             <div className="px-6 py-4 space-y-3">
-              {/* Setup Guide Link - Mobile */}
-              <Link
-                href="/setup"
-                className="block text-gray-700 hover:text-gray-900 font-medium py-3 px-4 rounded-lg transition-colors flex items-center space-x-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <BookOpen className="h-4 w-4" />
-                <span>Setup Guide</span>
-              </Link>
-
               {/* Bug Report Link - Mobile */}
               <a
                 href={bugReportUrl || "#"}
@@ -259,9 +199,11 @@ Additional Details:
 
               {!isLoading && !isLoginPage && !isAuthenticated && (
                 <Link href="/login">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                    <LogIn className="h-4 w-4" />
-                    <span>Log In</span>
+                  <Button
+                    variant="ghost"
+                    className="w-full font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+                  >
+                    <LogIn className="h-5 w-5 text-gray-700" />
                   </Button>
                 </Link>
               )}
@@ -283,7 +225,7 @@ Additional Details:
 
               {!isLoading &&
                 isAuthenticated &&
-                userType === "admin" &&
+                userRole === "admin" &&
                 !isAdminPage && (
                   <Link href="/admin">
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
@@ -294,7 +236,7 @@ Additional Details:
 
               {!isLoading &&
                 isAuthenticated &&
-                userType !== "admin" &&
+                userRole !== "admin" &&
                 !isDashboardPage && (
                   <Link href="/dashboard">
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">

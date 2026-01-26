@@ -49,7 +49,7 @@ export function getAppConfig(): AppConfig {
 
         appName: process.env.NEXT_PUBLIC_APP_NAME || `FIRST TeamMatch ${process.env.NEXT_PUBLIC_STATE_NAME || 'Oregon'}`,
         appDescription: process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
-            `Connecting passionate students with competitive FIRST robotics teams in ${process.env.NEXT_PUBLIC_STATE_NAME || 'Oregon'}.`,
+            `A public directory where students can discover and connect with FIRST robotics teams in ${process.env.NEXT_PUBLIC_STATE_NAME || 'Oregon'}.`,
 
         deploymentUrl: process.env.NEXT_PUBLIC_DEPLOYMENT_URL,
     };

@@ -16,12 +16,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle } from "lucide-react";
-import { signUp } from "@/lib/auth";
+import { signUp } from "@/lib/auth-client";
 import { PasswordInput } from "@/components/ui/password-input";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 const teamRegistrationSchema = z.object({
   teamName: z.string().min(1, "Team name is required"),
+  teamNumber: z.string().min(1, "Team number is required"),
+  teamWebsite: z.string().optional(),
   email: z.string().email("Invalid email address"),
   password: z
     .string()
@@ -136,6 +138,9 @@ export default function TeamRegistrationPage() {
       case 0:
         if (!currentValues.teamName?.trim()) {
           newStepErrors[0] = "Please enter team name";
+          isValid = false;
+        } else if (!currentValues.teamNumber?.trim()) {
+          newStepErrors[0] = "Please enter team number";
           isValid = false;
         } else {
           delete newStepErrors[0];
@@ -276,8 +281,8 @@ export default function TeamRegistrationPage() {
 
   const prevStep = () => {
     // Skip school name step when going back if not a school team
-    if (currentStep === 7 && !watch("isSchoolTeam")) {
-      setCurrentStep(5);
+    if (currentStep === 8 && !watch("isSchoolTeam")) {
+      setCurrentStep(6);
     } else {
       setCurrentStep((prev) => Math.max(prev - 1, 0));
     }
@@ -291,20 +296,21 @@ export default function TeamRegistrationPage() {
         data.email,
         data.password,
         {
-          team_name: data.teamName,
-          email: data.email,
-          first_level: data.firstLevel,
-          zip_code: data.zipCode,
-          areas_of_need: data.areasOfNeed,
-          grade_range_min: data.gradeRangeMin,
-          grade_range_max: data.gradeRangeMax,
-          time_commitment: data.timeCommitment,
+          teamName: data.teamName,
+          teamNumber: data.teamNumber,
+          teamWebsite: data.teamWebsite || null,
+          zipCode: data.zipCode,
+          firstLevel: data.firstLevel,
+          areasOfNeed: data.areasOfNeed,
+          gradeRangeMin: data.gradeRangeMin,
+          gradeRangeMax: data.gradeRangeMax,
+          timeCommitment: data.timeCommitment,
           qualities: data.qualities,
-          is_school_team: data.isSchoolTeam,
-          school_name: data.schoolName || null,
-          team_awards: data.teamAwards,
-        },
-        "team"
+          isSchoolTeam: data.isSchoolTeam || false,
+          schoolName: data.schoolName || null,
+          teamAwards: data.teamAwards || null,
+          phoneNumber: null,
+        }
       );
 
       if (authError) {
@@ -345,7 +351,7 @@ export default function TeamRegistrationPage() {
     );
   }
 
-  const totalSteps = watch("isSchoolTeam") ? 13 : 12;
+  const totalSteps = watch("isSchoolTeam") ? 14 : 13;
 
   return (
     <div
@@ -356,7 +362,7 @@ export default function TeamRegistrationPage() {
         <form
           onSubmit={(e) => {
             // Only allow submission when explicitly clicking the submit button on the last step
-            const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+            const maxStep = watch("isSchoolTeam") === true ? 13 : 12;
             if (!isExplicitSubmit || currentStep < maxStep) {
               e.preventDefault();
               return;
@@ -365,7 +371,7 @@ export default function TeamRegistrationPage() {
           }}
           onKeyDown={(e) => {
             // Prevent form submission on Enter key when on last step
-            const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+            const maxStep = watch("isSchoolTeam") === true ? 13 : 12;
             if (e.key === "Enter" && currentStep >= maxStep) {
               e.preventDefault();
             }
@@ -402,22 +408,52 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What's your team name?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
+                    </div>
+                    <div className="space-y-4">
+                      <Input
+                        {...register("teamName")}
+                        placeholder="Team name"
+                        className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .querySelector<HTMLInputElement>(
+                                'input[placeholder="Team number"]'
+                              )
+                              ?.focus();
+                          }
+                        }}
+                      />
+                      <Input
+                        {...register("teamNumber")}
+                        placeholder="Team number"
+                        className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .querySelector<HTMLInputElement>(
+                                'input[placeholder="Team website (optional)"]'
+                              )
+                              ?.focus();
+                          }
+                        }}
+                      />
+                      <Input
+                        {...register("teamWebsite")}
+                        placeholder="Team website (optional)"
+                        className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            nextStep();
+                          }
+                        }}
                       />
                     </div>
-                    <Input
-                      {...register("teamName")}
-                      placeholder="Team name"
-                      className="w-full text-lg border border-gray-200 rounded-lg focus:border-red-600 px-5 py-4 focus:ring-2 focus:ring-red-600 transition-colors"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          nextStep();
-                        }
-                      }}
-                    />
                   </>
                 )}
 
@@ -427,9 +463,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What's your email?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <Input
                       type="email"
@@ -453,9 +487,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         Create a password
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <PasswordInput
                       value={watch("password") || ""}
@@ -479,9 +511,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What FIRST level is your team?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <Select
                       value={watch("firstLevel") || ""}
@@ -510,9 +540,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What's your zip code??
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <Input
                       {...register("zipCode")}
@@ -535,9 +563,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         Is this a school team?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <div
                       className="space-y-3"
@@ -586,9 +612,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What's your school name?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <Input
                       {...register("schoolName")}
@@ -611,9 +635,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What areas do you need help with?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <div
                       className="space-y-3"
@@ -647,9 +669,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What grade range are you looking for?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -703,9 +723,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         How many hours per week do you expect from students?
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <div
                       className="space-y-4"
@@ -742,9 +760,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         Tell us about your team's achievements
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <Textarea
                       {...register("teamAwards")}
@@ -768,9 +784,7 @@ export default function TeamRegistrationPage() {
                       <h2 className="text-3xl font-semibold text-gray-900">
                         What qualities are you looking for? (Select up to 3)
                       </h2>
-                      <InfoTooltip
-                        content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it."
-                      />
+                      <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
                     <div className="space-y-3">
                       {qualities.map((quality) => {

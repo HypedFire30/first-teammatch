@@ -21,9 +21,11 @@ import {
 import { appConfig } from "@/lib/config";
 
 export default function SetupPage() {
-  const [databaseProvider, setDatabaseProvider] = useState<"firebase" | "supabase">("firebase");
+  const [databaseProvider, setDatabaseProvider] = useState<
+    "postgresql" | "supabase"
+  >("postgresql");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
-  
+
   const toggleCheckItem = (itemId: string) => {
     setCheckedItems((prev) => {
       const newSet = new Set(prev);
@@ -139,34 +141,59 @@ export default function SetupPage() {
               </div>
             </div>
             <p className="text-gray-700">
-              Open <code className="bg-gray-100 px-2 py-1 rounded">.env.local</code> and
-              customize the following:
+              Open{" "}
+              <code className="bg-gray-100 px-2 py-1 rounded">.env.local</code>{" "}
+              and customize the following:
             </p>
             <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
               <div className="space-y-3 text-sm font-mono min-w-max">
                 <div>
-                  <span className="text-gray-500"># State/Region Information</span>
+                  <span className="text-gray-500">
+                    # State/Region Information
+                  </span>
                   <div className="ml-4 mt-1">
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_STATE_NAME=YourState</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_STATE_ABBREVIATION=XX</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_REGION_NAME=YourState</div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_STATE_NAME=YourState
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_STATE_ABBREVIATION=XX
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_REGION_NAME=YourState
+                    </div>
                   </div>
                 </div>
                 <div>
-                  <span className="text-gray-500"># Organization Information</span>
+                  <span className="text-gray-500">
+                    # Organization Information
+                  </span>
                   <div className="ml-4 mt-1">
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_NAME=Your Team Name</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_LOCATION=City, State</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_WEBSITE=https://your-team-website.org</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_ORG_EMAIL=your-email@example.com</div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_ORG_NAME=Your Team Name
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_ORG_LOCATION=City, State
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_ORG_WEBSITE=https://your-team-website.org
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_ORG_EMAIL=your-email@example.com
+                    </div>
                   </div>
                 </div>
                 <div>
                   <span className="text-gray-500"># Contact & Branding</span>
                   <div className="ml-4 mt-1">
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_APP_NAME=FIRST TeamMatch YourState</div>
-                    <div className="whitespace-nowrap">NEXT_PUBLIC_APP_DESCRIPTION=Connecting students...</div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_APP_NAME=FIRST TeamMatch YourState
+                    </div>
+                    <div className="whitespace-nowrap">
+                      NEXT_PUBLIC_APP_DESCRIPTION=Connecting students...
+                    </div>
                   </div>
                 </div>
               </div>
@@ -219,10 +246,10 @@ export default function SetupPage() {
                       Important: Supabase Free Plan Limitation
                     </h4>
                     <p className="text-sm text-yellow-800">
-                      Supabase free plans shut off from inactivity. If your project
-                      goes unused for a period of time, it will be paused and you'll
-                      need to reactivate it. Keep this in mind when choosing your
-                      database provider.
+                      Supabase free plans shut off from inactivity. If your
+                      project goes unused for a period of time, it will be
+                      paused and you'll need to reactivate it. Keep this in mind
+                      when choosing your database provider.
                     </p>
                   </div>
                 </div>
@@ -250,7 +277,9 @@ export default function SetupPage() {
                       </a>
                     </li>
                     <li>Click "Add project" and enter a project name</li>
-                    <li>Follow the setup wizard (Google Analytics is optional)</li>
+                    <li>
+                      Follow the setup wizard (Google Analytics is optional)
+                    </li>
                   </ol>
                 </div>
 
@@ -331,12 +360,24 @@ export default function SetupPage() {
                   </ol>
                   <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
                     <div className="space-y-2 text-sm font-mono min-w-max">
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id</div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -391,7 +432,10 @@ export default function SetupPage() {
                   </h3>
                   <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
                     <li>Go to Table Editor in your Supabase dashboard</li>
-                    <li>Create the necessary tables for students, teams, and admins</li>
+                    <li>
+                      Create the necessary tables for students, teams, and
+                      admins
+                    </li>
                     <li>Set up Row Level Security (RLS) policies</li>
                     <li>Configure relationships between tables</li>
                   </ol>
@@ -422,9 +466,15 @@ export default function SetupPage() {
                   </ol>
                   <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
                     <div className="space-y-2 text-sm font-mono min-w-max">
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_SUPABASE_URL=your-project-url</div>
-                      <div className="whitespace-nowrap">NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key</div>
-                      <div className="whitespace-nowrap">SUPABASE_SERVICE_ROLE_KEY=your-service-role-key</div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_SUPABASE_URL=your-project-url
+                      </div>
+                      <div className="whitespace-nowrap">
+                        NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+                      </div>
+                      <div className="whitespace-nowrap">
+                        SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -476,22 +526,23 @@ export default function SetupPage() {
           <CardContent className="space-y-4">
             <ol className="list-decimal list-inside space-y-2 text-gray-700">
               <li>
-                Register a new account through the app (use "I'm a Student" or
-                "I'm a Team" button)
+                Register a new team account through the app (use "I'm a Team"
+                button)
               </li>
               <li>
                 Use the admin management script to promote them to admin:
                 <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm mt-2 overflow-x-auto w-full min-w-0">
                   <div className="whitespace-nowrap">
-                    <span className="text-gray-400">$</span> npm run manage:admins
-                    -- add your-email@example.com
+                    <span className="text-gray-400">$</span> npm run
+                    manage:admins -- add your-email@example.com
                   </div>
                 </div>
               </li>
             </ol>
             <p className="text-gray-600 text-sm mt-4">
               Or manually in Firebase Console: Go to Firestore Database, create
-              a document in the <code className="bg-gray-100 px-1 rounded">admins</code>{" "}
+              a document in the{" "}
+              <code className="bg-gray-100 px-1 rounded">admins</code>{" "}
               collection with the user's UID as the document ID, and add an{" "}
               <code className="bg-gray-100 px-1 rounded">email</code> field.
             </p>
@@ -531,7 +582,8 @@ export default function SetupPage() {
                 <li>Click "Add New Project" and import your repository</li>
                 <li>
                   Add <strong>ALL</strong> environment variables from your{" "}
-                  <code className="bg-gray-100 px-1 rounded">.env.local</code> file
+                  <code className="bg-gray-100 px-1 rounded">.env.local</code>{" "}
+                  file
                 </li>
                 <li>Click "Deploy"</li>
               </ol>
@@ -548,7 +600,14 @@ export default function SetupPage() {
                 <li>AWS Amplify</li>
                 <li>Netlify</li>
                 <li>Railway</li>
-                <li>Your own server (build with <code className="bg-gray-100 px-1 rounded">npm run build</code> and run with <code className="bg-gray-100 px-1 rounded">npm start</code>)</li>
+                <li>
+                  Your own server (build with{" "}
+                  <code className="bg-gray-100 px-1 rounded">
+                    npm run build
+                  </code>{" "}
+                  and run with{" "}
+                  <code className="bg-gray-100 px-1 rounded">npm start</code>)
+                </li>
               </ul>
             </div>
           </CardContent>
@@ -564,10 +623,11 @@ export default function SetupPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              Click each item to check it off as you complete it. (This checklist resets when you reload the page.)
+              Click each item to check it off as you complete it. (This
+              checklist resets when you reload the page.)
             </p>
             <ul className="space-y-2 text-gray-700">
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("firestore-rules")}
               >
@@ -576,11 +636,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("firestore-rules") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("firestore-rules")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   Firestore security rules are published
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("storage-rules")}
               >
@@ -589,11 +655,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("storage-rules") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("storage-rules")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   Storage security rules are published
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("admin-accounts")}
               >
@@ -602,11 +674,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("admin-accounts") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("admin-accounts")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   Admin accounts are properly set up
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("env-vars")}
               >
@@ -615,11 +693,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("env-vars") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("env-vars")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   Environment variables are set in production
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("auth-enabled")}
               >
@@ -628,11 +712,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("auth-enabled") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("auth-enabled")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   Firebase Authentication is enabled
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("test-registration")}
               >
@@ -641,11 +731,17 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("test-registration") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("test-registration")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   You've tested the registration flow
                 </span>
               </li>
-              <li 
+              <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
                 onClick={() => toggleCheckItem("test-admin")}
               >
@@ -654,7 +750,13 @@ export default function SetupPage() {
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
-                <span className={checkedItems.has("test-admin") ? "line-through text-gray-500" : ""}>
+                <span
+                  className={
+                    checkedItems.has("test-admin")
+                      ? "line-through text-gray-500"
+                      : ""
+                  }
+                >
                   You've tested the admin dashboard
                 </span>
               </li>
@@ -696,4 +798,3 @@ export default function SetupPage() {
     </div>
   );
 }
-

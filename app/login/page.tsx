@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, getUserType, resendConfirmationEmail, sendPasswordReset } from "@/lib/auth";
+import { signIn, requestPasswordReset } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +13,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showResendOption, setShowResendOption] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -32,59 +29,18 @@ export default function LoginPage() {
 
     if (authError) {
       setError(authError.message);
-
-      // Check if the error is related to email confirmation
-      if (
-        authError.message.toLowerCase().includes("email not confirmed") ||
-        authError.message.toLowerCase().includes("email not verified") ||
-        authError.message.toLowerCase().includes("confirm your email")
-      ) {
-        setShowResendOption(true);
-      }
-
       setIsLoading(false);
       return;
     }
 
     if (user) {
-      // Check user type to determine redirect
-      const { type, error: typeError } = await getUserType(user.uid);
-
-      if (typeError) {
-        setError("Error determining user type. Please try again.");
-        setIsLoading(false);
-        return;
-      }
-
       // Redirect based on user type
-      if (type === "admin") {
+      if (user.role === "admin") {
         router.push("/admin");
       } else {
         router.push("/dashboard");
       }
     }
-  };
-
-  const handleResendConfirmation = async () => {
-    if (!email) {
-      setError("Please enter your email address first.");
-      return;
-    }
-
-    setIsResending(true);
-    setError("");
-    setResendSuccess(false);
-
-    const { error: resendError } = await resendConfirmationEmail(email);
-
-    if (resendError) {
-      setError(`Failed to resend confirmation email: ${resendError.message}`);
-    } else {
-      setResendSuccess(true);
-      setShowResendOption(false);
-    }
-
-    setIsResending(false);
   };
 
   const handleForgotPassword = async () => {
@@ -97,16 +53,16 @@ export default function LoginPage() {
     setError("");
     setResetSuccess(false);
 
-    console.log('Password reset requested for email:', email);
-    
-    const { error: resetError } = await sendPasswordReset(email);
+    console.log("Password reset requested for email:", email);
+
+    const { error: resetError } = await requestPasswordReset(email);
 
     if (resetError) {
-      console.error('Password reset error:', resetError);
+      console.error("Password reset error:", resetError);
       setError(`Failed to send password reset email: ${resetError.message}`);
       setResetSuccess(false);
     } else {
-      console.log('Password reset email sent successfully');
+      console.log("Password reset email sent successfully");
       setResetSuccess(true);
       setShowForgotPassword(false);
       setError(""); // Clear any previous errors
@@ -171,28 +127,14 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-3">
                 <p className="text-red-600 text-sm">{error}</p>
-                {showResendOption && (
-                  <div className="mt-3 pt-3 border-t border-red-200">
-                    <p className="text-red-600 text-sm mb-2">
-                      Didn't receive the confirmation email?
-                    </p>
-                    <Button
-                      type="button"
-                      onClick={handleResendConfirmation}
-                      disabled={isResending}
-                      className="bg-red-600 hover:bg-red-700 text-white text-sm py-1 px-3 rounded transition-colors"
-                    >
-                      {isResending ? "Sending..." : "Resend Confirmation Email"}
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
 
             {showForgotPassword && (
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                 <p className="text-blue-600 text-sm mb-2">
-                  Enter your email address and we'll send you a link to reset your password.
+                  Enter your email address and we'll send you a link to reset
+                  your password.
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -224,20 +166,11 @@ export default function LoginPage() {
               </div>
             )}
 
-            {resendSuccess && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-3">
-                <p className="text-green-600 text-sm">
-                  ✅ Confirmation email sent! Please check your inbox and spam
-                  folder.
-                </p>
-              </div>
-            )}
-
             {resetSuccess && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3">
                 <p className="text-green-600 text-sm">
-                  ✅ Password reset email sent! Please check your inbox and spam folder.
-                  Click the link in the email to reset your password.
+                  ✅ Password reset email sent! Please check your inbox and spam
+                  folder. Click the link in the email to reset your password.
                 </p>
               </div>
             )}
@@ -253,19 +186,21 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 text-sm">
-              Don't have an account? <br />
-              <Link
-                href="/student-registration"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Register as Student
-              </Link>{" "}
-              or{" "}
+              Don't have an account?{" "}
               <Link
                 href="/team-registration"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Register as Team
+              </Link>
+            </p>
+            <p className="text-gray-600 text-sm mt-2">
+              Looking for a team?{" "}
+              <Link
+                href="/browse"
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Browse Teams
               </Link>
             </p>
           </div>
