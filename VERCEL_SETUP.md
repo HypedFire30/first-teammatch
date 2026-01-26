@@ -14,8 +14,8 @@ DATABASE_URL=postgresql://user:password@host:port/database
 - Go to Railway → Your PostgreSQL service → "Connect" tab
 - Copy the "Connection URL" (starts with `postgresql://`)
 
-### 2. App Configuration (REQUIRED)
-These control how your app appears:
+### 2. App Configuration (OPTIONAL - has defaults)
+These control how your app appears. If you don't set them, the app uses these defaults:
 ```
 NEXT_PUBLIC_APP_NAME=FIRST TeamMatch
 NEXT_PUBLIC_STATE_NAME=Oregon
@@ -28,6 +28,8 @@ NEXT_PUBLIC_ORG_EMAIL=revampedrobotics@gmail.com
 NEXT_PUBLIC_CONTACT_EMAIL=revampedrobotics@gmail.com
 NEXT_PUBLIC_APP_DESCRIPTION=A public directory where students can discover and connect with FIRST robotics teams in Oregon.
 ```
+
+**You can skip these if you're happy with the defaults!**
 
 ### 3. Email Configuration (OPTIONAL - for password resets)
 ```
@@ -74,7 +76,7 @@ Copy these from your `.env.local` file and add them to Vercel:
 - [ ] `DATABASE_URL` ⚠️ **MOST IMPORTANT** - without this, teams won't load!
   - Your value: `postgresql://postgres:lVbxgljYqRZnwcYwAmurQRFMFlAsirLP@maglev.proxy.rlwy.net:14036/railway`
 
-### App Configuration (Required):
+### App Configuration (OPTIONAL - skip if you want defaults):
 - [ ] `NEXT_PUBLIC_APP_NAME` (default: "FIRST TeamMatch")
 - [ ] `NEXT_PUBLIC_STATE_NAME` (default: "Oregon")
 - [ ] `NEXT_PUBLIC_STATE_ABBREVIATION` (default: "OR")
@@ -85,6 +87,8 @@ Copy these from your `.env.local` file and add them to Vercel:
 - [ ] `NEXT_PUBLIC_ORG_EMAIL` (default: "revampedrobotics@gmail.com")
 - [ ] `NEXT_PUBLIC_CONTACT_EMAIL` (default: "revampedrobotics@gmail.com")
 - [ ] `NEXT_PUBLIC_APP_DESCRIPTION` (default: "A public directory...")
+
+**You can skip all of these - the app will use the defaults shown above!**
 
 ### Optional (for email functionality):
 - [ ] `RESEND_API_KEY` (only if you want password reset emails)
