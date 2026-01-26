@@ -21,9 +21,7 @@ import {
 import { appConfig } from "@/lib/config";
 
 export default function SetupPage() {
-  const [databaseProvider, setDatabaseProvider] = useState<
-    "postgresql" | "supabase"
-  >("postgresql");
+  const [databaseProvider] = useState<"postgresql">("postgresql");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   const toggleCheckItem = (itemId: string) => {
@@ -212,52 +210,8 @@ export default function SetupPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Tabs */}
-            <div className="flex space-x-2 border-b border-gray-200 mb-6">
-              <button
-                onClick={() => setDatabaseProvider("firebase")}
-                className={`px-4 py-2 font-medium text-sm transition-colors border-b-2 ${
-                  databaseProvider === "firebase"
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Firebase
-              </button>
-              <button
-                onClick={() => setDatabaseProvider("supabase")}
-                className={`px-4 py-2 font-medium text-sm transition-colors border-b-2 ${
-                  databaseProvider === "supabase"
-                    ? "border-green-600 text-green-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Supabase
-              </button>
-            </div>
-
-            {/* Supabase Warning */}
-            {databaseProvider === "supabase" && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                <div className="flex items-start">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-yellow-900 mb-1">
-                      Important: Supabase Free Plan Limitation
-                    </h4>
-                    <p className="text-sm text-yellow-800">
-                      Supabase free plans shut off from inactivity. If your
-                      project goes unused for a period of time, it will be
-                      paused and you'll need to reactivate it. Keep this in mind
-                      when choosing your database provider.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Firebase Content */}
-            {databaseProvider === "firebase" && (
+            {/* PostgreSQL Content */}
+            {databaseProvider === "postgresql" && (
               <>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
@@ -384,102 +338,6 @@ export default function SetupPage() {
               </>
             )}
 
-            {/* Supabase Content */}
-            {databaseProvider === "supabase" && (
-              <>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Database className="h-4 w-4 mr-2 text-green-600" />
-                    Create Supabase Project
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>
-                      Go to{" "}
-                      <a
-                        href="https://supabase.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-600 hover:underline"
-                      >
-                        Supabase
-                      </a>{" "}
-                      and sign up for an account
-                    </li>
-                    <li>Click "New Project"</li>
-                    <li>Enter a project name and database password</li>
-                    <li>Select a region closest to your users</li>
-                    <li>Click "Create new project"</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Shield className="h-4 w-4 mr-2 text-green-600" />
-                    Enable Authentication
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Authentication → Providers</li>
-                    <li>Enable Email provider</li>
-                    <li>Configure email templates if needed</li>
-                    <li>Save your changes</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Database className="h-4 w-4 mr-2 text-green-600" />
-                    Set Up Database Tables
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Table Editor in your Supabase dashboard</li>
-                    <li>
-                      Create the necessary tables for students, teams, and
-                      admins
-                    </li>
-                    <li>Set up Row Level Security (RLS) policies</li>
-                    <li>Configure relationships between tables</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <FileText className="h-4 w-4 mr-2 text-purple-600" />
-                    Set Up Storage
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Storage in your Supabase dashboard</li>
-                    <li>Create a new bucket for resumes</li>
-                    <li>Set bucket to public or configure access policies</li>
-                    <li>Configure storage policies for file uploads</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Settings className="h-4 w-4 mr-2 text-orange-600" />
-                    Get Supabase Configuration
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6 mb-4">
-                    <li>Go to Project Settings → API</li>
-                    <li>Copy your Project URL and anon/public key</li>
-                    <li>Add them to your .env.local file</li>
-                  </ol>
-                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
-                    <div className="space-y-2 text-sm font-mono min-w-max">
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_SUPABASE_URL=your-project-url
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-                      </div>
-                      <div className="whitespace-nowrap">
-                        SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
           </CardContent>
         </Card>
 

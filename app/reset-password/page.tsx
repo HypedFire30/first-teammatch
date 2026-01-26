@@ -134,9 +134,8 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="password">New Password</Label>
+                <Label>New Password</Label>
                 <PasswordInput
-                  id="password"
                   value={password}
                   onChange={setPassword}
                   placeholder="Enter new password"
@@ -146,9 +145,8 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label>Confirm Password</Label>
                 <PasswordInput
-                  id="confirmPassword"
                   value={confirmPassword}
                   onChange={setConfirmPassword}
                   placeholder="Confirm new password"

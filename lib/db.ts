@@ -3,7 +3,7 @@
  * Uses PostgreSQL with Railway
  */
 
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, QueryResultRow } from 'pg';
 
 // Create connection pool
 const pool = new Pool({
@@ -27,7 +27,7 @@ pool.on('error', (err) => {
  * Execute a query with parameters
  * Prevents SQL injection by using parameterized queries
  */
-export async function query<T = any>(
+export async function query<T extends QueryResultRow = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
