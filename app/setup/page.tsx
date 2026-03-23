@@ -8,11 +8,9 @@ import {
   CheckCircle,
   Code,
   Database,
-  Shield,
   Rocket,
   Settings,
   Mail,
-  FileText,
   ArrowLeft,
   ExternalLink,
   AlertTriangle,
@@ -82,7 +80,7 @@ export default function SetupPage() {
           <CardContent>
             <ul className="space-y-2 text-gray-700">
               <li>• Node.js 18+ and npm</li>
-              <li>• A Firebase account (free tier works)</li>
+              <li>• A Neon account (free, at neon.tech) for the database</li>
               <li>• A GitHub account (for cloning the repository)</li>
               <li>• Basic knowledge of command line and web development</li>
             </ul>
@@ -194,6 +192,14 @@ export default function SetupPage() {
                     </div>
                   </div>
                 </div>
+                <div>
+                  <span className="text-gray-500"># Database</span>
+                  <div className="ml-4 mt-1">
+                    <div className="whitespace-nowrap">
+                      DATABASE_URL=postgresql://user:pass@ep-xxx.pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -210,134 +216,66 @@ export default function SetupPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* PostgreSQL Content */}
-            {databaseProvider === "postgresql" && (
-              <>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
                     <Database className="h-4 w-4 mr-2 text-blue-600" />
-                    Create Firebase Project
+                    Create a Neon Project
                   </h3>
                   <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
                     <li>
                       Go to{" "}
                       <a
-                        href="https://console.firebase.google.com/"
+                        href="https://neon.tech"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        Firebase Console
-                      </a>
-                    </li>
-                    <li>Click "Add project" and enter a project name</li>
-                    <li>
-                      Follow the setup wizard (Google Analytics is optional)
-                    </li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Shield className="h-4 w-4 mr-2 text-green-600" />
-                    Enable Authentication
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Authentication → Get started</li>
-                    <li>Click Sign-in method tab</li>
-                    <li>Enable Email/Password provider</li>
-                    <li>Click Save</li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Database className="h-4 w-4 mr-2 text-blue-600" />
-                    Create Firestore Database
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Firestore Database → Create database</li>
-                    <li>Choose Start in production mode</li>
-                    <li>Select a location closest to your users</li>
-                    <li>Click Enable</li>
-                    <li>
-                      Go to Rules tab, replace with rules from{" "}
-                      <a
-                        href="https://github.com/HypedFire30/first-teammatch/blob/main/firestore.rules"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-mono bg-gray-100 px-1 rounded"
-                      >
-                        firestore.rules
+                        neon.tech
                       </a>{" "}
-                      in this repository, click Publish
+                      and sign up (free, no credit card required)
                     </li>
-                  </ol>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <FileText className="h-4 w-4 mr-2 text-purple-600" />
-                    Set Up Firebase Storage
-                  </h3>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
-                    <li>Go to Storage → Get started</li>
-                    <li>Choose Start in production mode</li>
-                    <li>Use the same location as your Firestore database</li>
-                    <li>Click Done</li>
-                    <li>
-                      Go to Rules tab, replace with rules from{" "}
-                      <a
-                        href="https://github.com/HypedFire30/first-teammatch/blob/main/storage.rules"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-mono bg-gray-100 px-1 rounded"
-                      >
-                        storage.rules
-                      </a>{" "}
-                      in this repository, click Publish
-                    </li>
+                    <li>Click "New Project" and give it a name</li>
+                    <li>Select <strong>AWS</strong> as the provider and <strong>US East (N. Virginia)</strong> as the region</li>
+                    <li>Leave Neon Auth <strong>off</strong></li>
+                    <li>Click "Create project"</li>
                   </ol>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
                     <Settings className="h-4 w-4 mr-2 text-orange-600" />
-                    Get Firebase Configuration
+                    Get Your Connection String
                   </h3>
                   <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6 mb-4">
-                    <li>Go to Project Settings (gear icon) → Your apps</li>
-                    <li>Click the Web icon to add a web app</li>
-                    <li>Register your app (nickname is optional)</li>
-                    <li>Copy the Firebase configuration values</li>
-                    <li>Add them to your .env.local file</li>
+                    <li>From your Neon project dashboard, click "Connect"</li>
+                    <li>Select <strong>Pooled connection</strong></li>
+                    <li>Copy the connection string</li>
+                    <li>Add it to your <code className="bg-gray-100 px-1 rounded">.env.local</code> as <code className="bg-gray-100 px-1 rounded">DATABASE_URL</code></li>
                   </ol>
-                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg overflow-x-auto w-full min-w-0">
-                    <div className="space-y-2 text-sm font-mono min-w-max">
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key-here
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-                      </div>
-                      <div className="whitespace-nowrap">
-                        NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-                      </div>
-                    </div>
-                  </div>
                 </div>
-              </>
-            )}
 
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <Code className="h-4 w-4 mr-2 text-purple-600" />
+                    Run the Schema
+                  </h3>
+                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-6">
+                    <li>In the Neon dashboard, open the <strong>SQL Editor</strong></li>
+                    <li>
+                      Copy the contents of{" "}
+                      <a
+                        href="https://github.com/HypedFire30/first-teammatch/blob/main/database/schema.sql"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline font-mono bg-gray-100 px-1 rounded"
+                      >
+                        database/schema.sql
+                      </a>{" "}
+                      from this repository
+                    </li>
+                    <li>Paste it into the SQL Editor and click <strong>Run</strong></li>
+                  </ol>
+                </div>
           </CardContent>
         </Card>
 
@@ -397,13 +335,6 @@ export default function SetupPage() {
                 </div>
               </li>
             </ol>
-            <p className="text-gray-600 text-sm mt-4">
-              Or manually in Firebase Console: Go to Firestore Database, create
-              a document in the{" "}
-              <code className="bg-gray-100 px-1 rounded">admins</code>{" "}
-              collection with the user's UID as the document ID, and add an{" "}
-              <code className="bg-gray-100 px-1 rounded">email</code> field.
-            </p>
           </CardContent>
         </Card>
 
@@ -487,40 +418,40 @@ export default function SetupPage() {
             <ul className="space-y-2 text-gray-700">
               <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
-                onClick={() => toggleCheckItem("firestore-rules")}
+                onClick={() => toggleCheckItem("db-schema")}
               >
-                {checkedItems.has("firestore-rules") ? (
+                {checkedItems.has("db-schema") ? (
                   <CheckCircle className="h-5 w-5 mr-2 mt-0.5 text-green-600 flex-shrink-0" />
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
                 <span
                   className={
-                    checkedItems.has("firestore-rules")
+                    checkedItems.has("db-schema")
                       ? "line-through text-gray-500"
                       : ""
                   }
                 >
-                  Firestore security rules are published
+                  database/schema.sql has been run on your Neon database
                 </span>
               </li>
               <li
                 className="flex items-start cursor-pointer hover:bg-green-100/50 rounded-md p-2 -ml-2 transition-colors"
-                onClick={() => toggleCheckItem("storage-rules")}
+                onClick={() => toggleCheckItem("db-url")}
               >
-                {checkedItems.has("storage-rules") ? (
+                {checkedItems.has("db-url") ? (
                   <CheckCircle className="h-5 w-5 mr-2 mt-0.5 text-green-600 flex-shrink-0" />
                 ) : (
                   <div className="h-5 w-5 mr-2 mt-0.5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                 )}
                 <span
                   className={
-                    checkedItems.has("storage-rules")
+                    checkedItems.has("db-url")
                       ? "line-through text-gray-500"
                       : ""
                   }
                 >
-                  Storage security rules are published
+                  DATABASE_URL is set in your environment variables
                 </span>
               </li>
               <li
@@ -539,7 +470,7 @@ export default function SetupPage() {
                       : ""
                   }
                 >
-                  Admin accounts are properly set up
+                  Admin account created with manage:admins script
                 </span>
               </li>
               <li
@@ -577,7 +508,7 @@ export default function SetupPage() {
                       : ""
                   }
                 >
-                  Firebase Authentication is enabled
+                  Login and registration flow tested successfully
                 </span>
               </li>
               <li
