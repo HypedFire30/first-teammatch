@@ -206,15 +206,15 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-8 pb-2">
+      <footer className="bg-slate-800 border-t border-slate-700">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* Mission */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Our Mission
               </h3>
-              <p className="text-base text-gray-600 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 To strengthen the FIRST robotics community by providing a public
                 directory where students can discover teams and teams can
                 connect with passionate students, fostering innovation and
@@ -224,16 +224,16 @@ export default function HomePage() {
 
             {/* About RevAmped */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 About RevAmped
               </h3>
-              <p className="text-base text-gray-600 leading-relaxed mb-4">
+              <p className="text-base text-gray-300 leading-relaxed mb-4">
                 {appConfig.organizationName} is a competitive FIRST Tech
                 Challenge team based in {appConfig.organizationLocation}. We're
                 passionate about robotics, innovation, and building a stronger
                 FIRST community.
               </p>
-              <div className="flex items-center text-base text-gray-600">
+              <div className="flex items-center text-base text-gray-300">
                 <MapPin className="h-4 w-4 mr-2" />
                 <span>{appConfig.organizationLocation}</span>
               </div>
@@ -241,10 +241,10 @@ export default function HomePage() {
 
             {/* Contact */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Contact Us
               </h3>
-              <p className="text-base text-gray-600 mb-6">
+              <p className="text-base text-gray-300 mb-6">
                 Have questions or want to learn more? We'd love to hear from
                 you.
               </p>
@@ -252,7 +252,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="border-slate-500 text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
                 >
                   <a href={`mailto:${appConfig.organizationEmail}`}>
                     <Mail className="h-4 w-4 mr-2" />
@@ -263,7 +263,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="border-slate-500 text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
                 >
                   <a
                     href={appConfig.organizationWebsite}
@@ -278,14 +278,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">
-              © 2025 {appConfig.appName}. Built by {appConfig.organizationName}.
+          <div className="border-t border-slate-700 pt-6 pb-4 text-center">
+            <p className="text-sm text-gray-400 mb-2">
+              © {new Date().getFullYear()} {appConfig.appName}. Built by {appConfig.organizationName}.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400 mt-2">
               <Link
                 href="/privacy"
-                className="text-gray-500 hover:text-gray-700 underline"
+                className="text-gray-400 hover:text-white underline transition-colors"
               >
                 Privacy Policy
               </Link>

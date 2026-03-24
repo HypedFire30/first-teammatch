@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pg_dump \"postgresql://postgres:lVbxgljYqRZnwcYwAmurQRFMFlAsirLP@maglev.proxy.rlwy.net:14036/railway\" --no-owner --no-acl --format=plain --file=railway_backup.sql)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//Applications/Postgres.app/Contents/**)",
+      "Bash(brew install:*)",
+      "Bash(pg_dump --version)",
+      "Bash(psql \"postgresql://neondb_owner:npg_Eihe2kw1CcDV@ep-summer-hill-an0x9q6t-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" -c \"SELECT ''users'' as table, count\\(*\\) from users UNION ALL SELECT ''teams'', count\\(*\\) from teams UNION ALL SELECT ''sessions'', count\\(*\\) from sessions UNION ALL SELECT ''password_reset_tokens'', count\\(*\\) from password_reset_tokens UNION ALL SELECT ''contact_views'', count\\(*\\) from contact_views;\")",
+      "Bash(psql \"postgresql://neondb_owner:npg_Eihe2kw1CcDV@ep-summer-hill-an0x9q6t-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" -c \"\\\\dt public.*\")",
+      "Bash(psql \"postgresql://neondb_owner:npg_Eihe2kw1CcDV@ep-summer-hill-an0x9q6t-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" -c \"SELECT ''users'' as tbl, count\\(*\\) from public.users UNION ALL SELECT ''teams'', count\\(*\\) from public.teams UNION ALL SELECT ''sessions'', count\\(*\\) from public.sessions UNION ALL SELECT ''password_reset_tokens'', count\\(*\\) from public.password_reset_tokens UNION ALL SELECT ''contact_views'', count\\(*\\) from public.contact_views;\")",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

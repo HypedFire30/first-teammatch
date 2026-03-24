@@ -100,18 +100,20 @@ Additional Details:
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {/* Bug Report Link */}
-            <a
-              href={bugReportUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors flex items-center space-x-1.5 ${
-                !bugReportUrl ? "pointer-events-none opacity-50" : ""
-              }`}
+            <Button
+              variant="ghost"
+              className="p-2 rounded-lg transition-colors"
+              asChild
+              disabled={!bugReportUrl}
             >
-              <Bug className="h-4 w-4" />
-              <span>Bug Report</span>
-            </a>
+              <a
+                href={bugReportUrl || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Bug className="h-5 w-5 text-gray-700" />
+              </a>
+            </Button>
 
             {!isLoading && !isLoginPage && !isAuthenticated && (
               <Link href="/login">
@@ -183,19 +185,21 @@ Additional Details:
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md">
             <div className="px-6 py-4 space-y-3">
-              {/* Bug Report Link - Mobile */}
-              <a
-                href={bugReportUrl || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block text-gray-700 hover:text-gray-900 font-medium py-3 px-4 rounded-lg transition-colors flex items-center space-x-2 ${
-                  !bugReportUrl ? "pointer-events-none opacity-50" : ""
-                }`}
+              <Button
+                variant="ghost"
+                className="w-full py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+                asChild
+                disabled={!bugReportUrl}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Bug className="h-4 w-4" />
-                <span>Bug Report</span>
-              </a>
+                <a
+                  href={bugReportUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Bug className="h-5 w-5 text-gray-700" />
+                </a>
+              </Button>
 
               {!isLoading && !isLoginPage && !isAuthenticated && (
                 <Link href="/login">

@@ -37,16 +37,10 @@ export interface Team {
   contact_views: number;
 }
 
-/**
- * Hash a password using bcrypt
- */
 export async function hashPassword(password: string): Promise<string> {
   return hash(password, BCRYPT_ROUNDS);
 }
 
-/**
- * Verify a password against a hash
- */
 export async function verifyPassword(
   password: string,
   hash: string
@@ -54,9 +48,6 @@ export async function verifyPassword(
   return compare(password, hash);
 }
 
-/**
- * Generate a secure random token
- */
 export function generateToken(length: number = 32): string {
   return randomBytes(length).toString('hex');
 }
@@ -121,30 +112,18 @@ export async function getSession(sessionToken: string): Promise<{
   };
 }
 
-/**
- * Delete a session (logout)
- */
 export async function deleteSession(sessionToken: string): Promise<void> {
   await query('DELETE FROM sessions WHERE session_token = $1', [sessionToken]);
 }
 
-/**
- * Delete all sessions for a user
- */
 export async function deleteAllUserSessions(userId: string): Promise<void> {
   await query('DELETE FROM sessions WHERE user_id = $1', [userId]);
 }
 
-/**
- * Clean up expired sessions
- */
 export async function cleanupExpiredSessions(): Promise<void> {
   await query('DELETE FROM sessions WHERE expires_at < NOW()');
 }
 
-/**
- * Get user by email
- */
 export async function getUserByEmail(email: string): Promise<User | null> {
   const result = await query<{
     id: string;
@@ -173,9 +152,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   };
 }
 
-/**
- * Get user by ID
- */
 export async function getUserById(userId: string): Promise<User | null> {
   const result = await query<{
     id: string;
@@ -242,9 +218,6 @@ export async function getUserWithPassword(email: string): Promise<{
   };
 }
 
-/**
- * Create a new user
- */
 export async function createUser(
   email: string,
   passwordHash: string | null,
@@ -273,9 +246,6 @@ export async function createUser(
   };
 }
 
-/**
- * Update user password
- */
 export async function updateUserPassword(
   userId: string,
   newPasswordHash: string

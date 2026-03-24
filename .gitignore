@@ -39,4 +39,8 @@ next-env.d.ts
 *.swo
 
 # OS
-Thumbs.db 
+Thumbs.db
+
+# Database backups
+*.sql
+*.sql.backup

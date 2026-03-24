@@ -8,16 +8,10 @@ import { getSession } from './auth-server';
 
 const SESSION_COOKIE_NAME = 'session_token';
 
-/**
- * Get session token from request cookies
- */
 export function getSessionToken(request: NextRequest): string | null {
   return request.cookies.get(SESSION_COOKIE_NAME)?.value || null;
 }
 
-/**
- * Set session cookie in response
- */
 export function setSessionCookie(
   response: NextResponse,
   sessionToken: string
@@ -32,9 +26,6 @@ export function setSessionCookie(
   });
 }
 
-/**
- * Clear session cookie
- */
 export function clearSessionCookie(response: NextResponse): void {
   response.cookies.delete(SESSION_COOKIE_NAME);
 }

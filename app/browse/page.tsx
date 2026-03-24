@@ -76,7 +76,7 @@ export default function BrowsePage() {
   const [selectedTeamEmail, setSelectedTeamEmail] = useState<string>("");
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [verifiedTeams, setVerifiedTeams] = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
   const [filters, setFilters] = useState<SearchFilters>({
     firstLevel: searchParams.get("firstLevel") || "any",
@@ -200,6 +200,18 @@ export default function BrowsePage() {
       applyFilters(teams, filters);
     }
   }, [filters, teams, searchQuery, sortBy, applyFilters]);
+
+  // Sync filters to URL so they're bookmarkable and shareable
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.firstLevel && filters.firstLevel !== "any") params.set("firstLevel", filters.firstLevel);
+    if (filters.zipCode) params.set("zipCode", filters.zipCode);
+    if (filters.areasOfNeed.length > 0) params.set("areasOfNeed", filters.areasOfNeed.join(","));
+    if (filters.qualities.length > 0) params.set("qualities", filters.qualities.join(","));
+    if (searchQuery) params.set("q", searchQuery);
+    const qs = params.toString();
+    router.replace(qs ? `/browse?${qs}` : "/browse", { scroll: false });
+  }, [filters, searchQuery]);
 
   // Update sort when zip code changes
   useEffect(() => {
