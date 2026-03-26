@@ -10,7 +10,6 @@ import {
   Mail,
   Award,
   MapPin,
-  Star,
   Building2,
   Bot,
   Search,
@@ -94,7 +93,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-start gap-8">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-xl font-bold text-white">1</span>
+                  <Target className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
@@ -113,7 +112,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-start gap-8">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
-                  <span className="text-xl font-bold text-white">2</span>
+                  <Search className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
@@ -132,7 +131,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-start gap-8">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-xl font-bold text-white">3</span>
+                  <Mail className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
@@ -151,7 +150,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-8 sm:py-10">
+      <section className="py-8 sm:py-10 pb-20 sm:pb-24">
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -163,9 +162,9 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-8 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Search className="h-5 w-5 text-blue-600" />
+            <div className="p-8 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+              <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-600 rounded-lg flex items-center justify-center mb-6 transition-colors duration-300">
+                <Search className="h-5 w-5 text-blue-600 group-hover:text-white transition-colors duration-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 Easy Discovery
@@ -176,9 +175,9 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="p-8 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-6">
-                <Building2 className="h-5 w-5 text-green-600" />
+            <div className="p-8 border border-gray-200 rounded-xl hover:border-green-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+              <div className="w-10 h-10 bg-green-100 group-hover:bg-green-600 rounded-lg flex items-center justify-center mb-6 transition-colors duration-300">
+                <Building2 className="h-5 w-5 text-green-600 group-hover:text-white transition-colors duration-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 Community Built
@@ -189,9 +188,9 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="p-8 border border-gray-200 rounded-lg hover:border-red-300 transition-colors">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <Award className="h-5 w-5 text-red-600" />
+            <div className="p-8 border border-gray-200 rounded-xl hover:border-red-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+              <div className="w-10 h-10 bg-red-100 group-hover:bg-red-600 rounded-lg flex items-center justify-center mb-6 transition-colors duration-300">
+                <Award className="h-5 w-5 text-red-600 group-hover:text-white transition-colors duration-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 Growing Community
@@ -252,7 +251,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-slate-500 text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                  className="border-slate-400 text-white hover:bg-slate-700 hover:border-white transition-colors"
                 >
                   <a href={`mailto:${appConfig.organizationEmail}`}>
                     <Mail className="h-4 w-4 mr-2" />
@@ -263,7 +262,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-slate-500 text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                  className="border-slate-400 text-white hover:bg-slate-700 hover:border-white transition-colors"
                 >
                   <a
                     href={appConfig.organizationWebsite}
