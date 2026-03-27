@@ -251,7 +251,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-slate-400 text-white hover:bg-slate-700 hover:border-white transition-colors"
+                  className="bg-white border-white text-slate-800 hover:bg-slate-100 transition-colors"
                 >
                   <a href={`mailto:${appConfig.organizationEmail}`}>
                     <Mail className="h-4 w-4 mr-2" />
@@ -262,7 +262,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="border-slate-400 text-white hover:bg-slate-700 hover:border-white transition-colors"
+                  className="bg-white border-white text-slate-800 hover:bg-slate-100 transition-colors"
                 >
                   <a
                     href={appConfig.organizationWebsite}
