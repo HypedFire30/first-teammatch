@@ -264,7 +264,7 @@ export default function TeamRegistrationPage() {
       return;
     }
 
-    const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
+    const maxStep = 11;
 
     // Prevent going beyond the last step
     if (currentStep >= maxStep) {
@@ -281,8 +281,8 @@ export default function TeamRegistrationPage() {
 
   const prevStep = () => {
     // Skip school name step when going back if not a school team
-    if (currentStep === 8 && !watch("isSchoolTeam")) {
-      setCurrentStep(6);
+    if (currentStep === 7 && !watch("isSchoolTeam")) {
+      setCurrentStep(5);
     } else {
       setCurrentStep((prev) => Math.max(prev - 1, 0));
     }
@@ -292,7 +292,7 @@ export default function TeamRegistrationPage() {
     if (isSubmitting) return; // Prevent double submission
 
     try {
-      const { user, error: authError } = await signUp(
+      const { error: authError } = await signUp(
         data.email,
         data.password,
         {
@@ -351,7 +351,7 @@ export default function TeamRegistrationPage() {
     );
   }
 
-  const totalSteps = watch("isSchoolTeam") ? 14 : 13;
+  const totalSteps = watch("isSchoolTeam") ? 12 : 11;
 
   return (
     <div
@@ -362,8 +362,7 @@ export default function TeamRegistrationPage() {
         <form
           onSubmit={(e) => {
             // Only allow submission when explicitly clicking the submit button on the last step
-            const maxStep = watch("isSchoolTeam") === true ? 13 : 12;
-            if (!isExplicitSubmit || currentStep < maxStep) {
+            if (!isExplicitSubmit || currentStep < 11) {
               e.preventDefault();
               return;
             }
@@ -371,8 +370,7 @@ export default function TeamRegistrationPage() {
           }}
           onKeyDown={(e) => {
             // Prevent form submission on Enter key when on last step
-            const maxStep = watch("isSchoolTeam") === true ? 13 : 12;
-            if (e.key === "Enter" && currentStep >= maxStep) {
+            if (e.key === "Enter" && currentStep >= 11) {
               e.preventDefault();
             }
           }}
@@ -538,7 +536,7 @@ export default function TeamRegistrationPage() {
                   <>
                     <div className="flex items-center justify-between mb-8">
                       <h2 className="text-3xl font-semibold text-gray-900">
-                        What's your zip code??
+                        What's your zip code?
                       </h2>
                       <InfoTooltip content="By submitting this form, you consent to the use of your team name, email address, and team information for the purpose of matching you with qualified students. Your information will only be shared with registered students for matching purposes. You must be at least 13 years of age to use this form, and by submitting this form, you agree that you have obtained parental consent to submit it." />
                     </div>
@@ -841,7 +839,7 @@ export default function TeamRegistrationPage() {
                 ← Back
               </button>
 
-              {currentStep < (watch("isSchoolTeam") === true ? 12 : 11) ? (
+              {currentStep < 11 ? (
                 <button
                   type="button"
                   onClick={nextStep}
@@ -856,9 +854,7 @@ export default function TeamRegistrationPage() {
                   onClick={(e) => {
                     // Mark that this is an explicit submit button click
                     setIsExplicitSubmit(true);
-                    // Ensure we're on the last step before allowing submission
-                    const maxStep = watch("isSchoolTeam") === true ? 12 : 11;
-                    if (currentStep < maxStep) {
+                    if (currentStep < 11) {
                       e.preventDefault();
                       setIsExplicitSubmit(false);
                       return;

@@ -274,6 +274,9 @@ export default function HomePage() {
                   </a>
                 </Button>
               </div>
+              <p className="text-xs text-gray-400 mt-4">
+                This app is not funded, sponsored, or endorsed by FIRST. It is an independent tool built for FIRST teams.
+              </p>
             </div>
           </div>
 
